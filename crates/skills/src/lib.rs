@@ -26,6 +26,14 @@ use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, warn};
 
+/// Skills compiled into the binary. Users can override any of them by
+/// dropping a same-named `.md` file into `~/.mimo/skills/`.
+pub const BUILTIN_SKILLS: &[(&str, &str)] = &[
+    ("python-style.md", include_str!("../../../examples/skills/python-style.md")),
+    ("rust-style.md", include_str!("../../../examples/skills/rust-style.md")),
+    ("git-commits.md", include_str!("../../../examples/skills/git-commits.md")),
+];
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SkillFrontmatter {
     pub name: String,
@@ -93,6 +101,42 @@ impl SkillRegistry {
         Self { skills: Vec::new() }
     }
 
+    /// Pre-loaded with the built-in skills shipped inside the binary.
+    /// Users override any of them by dropping a same-named file into
+    /// `~/.mimo/skills/`.
+    pub fn with_builtins() -> Self {
+        let mut r = Self::new();
+        r.load_builtins();
+        r
+    }
+
+    /// Loads each built-in skill that's compiled into the binary via
+    /// `include_str!`. Failures are logged but never abort startup.
+    pub fn load_builtins(&mut self) {
+        for (filename, raw) in BUILTIN_SKILLS {
+            match Self::parse(filename, raw) {
+                Ok(s) => {
+                    debug!(skill = %s.frontmatter.name, "loaded built-in");
+                    self.skills.push(s);
+                }
+                Err(e) => warn!(file = %filename, ?e, "built-in skill failed to parse"),
+            }
+        }
+    }
+
+    /// Parse a skill from a raw markdown string + a synthetic source label.
+    pub fn parse(source_label: &str, raw: &str) -> Result<Skill> {
+        let (fm, body) = parse_frontmatter(raw)
+            .ok_or_else(|| anyhow!("no YAML frontmatter in {}", source_label))?;
+        let frontmatter: SkillFrontmatter =
+            serde_yaml::from_str(fm).with_context(|| format!("yaml in {}", source_label))?;
+        Ok(Skill {
+            frontmatter,
+            body: body.to_string(),
+            source: PathBuf::from(format!("<builtin>:{source_label}")),
+        })
+    }
+
     /// Load skills from a directory of `.md` files (non-recursive).
     pub fn load_dir(&mut self, dir: &Path) -> Result<usize> {
         if !dir.exists() {
@@ -122,15 +166,23 @@ impl SkillRegistry {
     pub fn load_file(path: &Path) -> Result<Skill> {
         let raw =
             std::fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
-        let (fm, body) = parse_frontmatter(&raw)
-            .ok_or_else(|| anyhow!("no YAML frontmatter in {}", path.display()))?;
-        let frontmatter: SkillFrontmatter =
-            serde_yaml::from_str(fm).with_context(|| format!("yaml in {}", path.display()))?;
-        Ok(Skill {
-            frontmatter,
-            body: body.to_string(),
-            source: path.to_path_buf(),
-        })
+        let mut s = Self::parse(&path.display().to_string(), &raw)?;
+        s.source = path.to_path_buf();
+        Ok(s)
+    }
+
+    /// Replace any existing skill with the same `name` (so user-supplied skills
+    /// override built-ins).
+    pub fn dedupe_keep_last(&mut self) {
+        let mut seen = std::collections::HashSet::new();
+        let mut keep: Vec<Skill> = Vec::with_capacity(self.skills.len());
+        for s in self.skills.drain(..).rev() {
+            if seen.insert(s.frontmatter.name.clone()) {
+                keep.push(s);
+            }
+        }
+        keep.reverse();
+        self.skills = keep;
     }
 
     pub fn iter(&self) -> impl Iterator<Item = &Skill> {

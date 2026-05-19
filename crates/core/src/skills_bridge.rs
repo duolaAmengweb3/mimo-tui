@@ -8,7 +8,9 @@ use tracing::info;
 use crate::paths;
 
 pub fn load_default_skills(workspace: &Path) -> Result<SkillRegistry> {
-    let mut reg = SkillRegistry::new();
+    // Built-ins ship with the binary; user skills can override by re-using the
+    // same `name` in frontmatter.
+    let mut reg = SkillRegistry::with_builtins();
 
     // Global skills.
     if let Ok(global) = paths::skills_dir() {
@@ -36,5 +38,7 @@ pub fn load_default_skills(workspace: &Path) -> Result<SkillRegistry> {
         }
     }
 
+    // User skills override built-ins with the same `name`.
+    reg.dedupe_keep_last();
     Ok(reg)
 }

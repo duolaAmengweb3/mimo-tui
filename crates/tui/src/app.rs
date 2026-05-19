@@ -255,7 +255,7 @@ impl App {
         match name {
             "help" | "h" | "?" => {
                 self.items.push(Item::Note(
-                    "/help · /model <name> · /mode plan|agent|auto · /region cn|sgp|ams · /usage · /clear · /exit".to_string(),
+                    "/help · /model <name> · /mode plan|agent|auto · /region cn|sgp|ams · /usage · /sessions [list|resume <id>|fork <id>] · /clear · /exit".to_string(),
                 ));
             }
             "exit" | "quit" | "q" => self.should_quit = true,
@@ -300,8 +300,107 @@ impl App {
                     }
                 }
             }
+            "sessions" => {
+                self.handle_sessions(parts);
+            }
             _ => self.items.push(Item::Note(format!("unknown command /{}", name))),
         }
+    }
+
+    fn handle_sessions<'a, I: Iterator<Item = &'a str>>(&mut self, mut parts: I) {
+        match parts.next().unwrap_or("list") {
+            "list" => match mimo_tui_core::session::Session::list_recent(10) {
+                Ok(metas) if metas.is_empty() => {
+                    self.items
+                        .push(Item::Note("(no saved sessions yet)".to_string()));
+                }
+                Ok(metas) => {
+                    self.items.push(Item::Note(format!(
+                        "{} recent sessions (most recent first):",
+                        metas.len()
+                    )));
+                    for m in metas {
+                        let short_id: String = m.id.chars().take(8).collect();
+                        let when = m.created_at.format("%Y-%m-%d %H:%M");
+                        self.items.push(Item::Note(format!(
+                            "  {} · {} · {} · {} turns · {}",
+                            short_id,
+                            when,
+                            m.model,
+                            m.turn_count,
+                            m.workspace.display(),
+                        )));
+                    }
+                }
+                Err(e) => self.items.push(Item::Error(format!("list sessions: {e}"))),
+            },
+            "resume" => match parts.next() {
+                Some(id_prefix) => self.resume_session(id_prefix.to_string(), false),
+                None => self
+                    .items
+                    .push(Item::Note("usage: /sessions resume <id-prefix>".to_string())),
+            },
+            "fork" => match parts.next() {
+                Some(id_prefix) => self.resume_session(id_prefix.to_string(), true),
+                None => self
+                    .items
+                    .push(Item::Note("usage: /sessions fork <id-prefix>".to_string())),
+            },
+            other => self
+                .items
+                .push(Item::Note(format!("/sessions {} — try list|resume|fork", other))),
+        }
+    }
+
+    /// Load a session by id-prefix and adopt its message history.
+    /// If `fork` is true, give it a fresh id so subsequent saves don't overwrite.
+    fn resume_session(&mut self, id_prefix: String, fork: bool) {
+        let metas = match mimo_tui_core::session::Session::list_recent(50) {
+            Ok(m) => m,
+            Err(e) => {
+                self.items.push(Item::Error(format!("list: {e}")));
+                return;
+            }
+        };
+        let id = match metas.iter().find(|m| m.id.starts_with(&id_prefix)) {
+            Some(m) => m.id.clone(),
+            None => {
+                self.items
+                    .push(Item::Note(format!("no session matches prefix {}", id_prefix)));
+                return;
+            }
+        };
+        let loaded = match mimo_tui_core::session::Session::load(&id) {
+            Ok(s) => s,
+            Err(e) => {
+                self.items.push(Item::Error(format!("load {id}: {e}")));
+                return;
+            }
+        };
+
+        let agent = self.agent.clone();
+        let tx = self.event_tx.clone();
+        tokio::spawn(async move {
+            let mut a = agent.lock().await;
+            a.session = if fork {
+                mimo_tui_core::session::Session {
+                    id: uuid::Uuid::new_v4().to_string(),
+                    created_at: chrono::Utc::now(),
+                    workspace: loaded.workspace.clone(),
+                    model: loaded.model.clone(),
+                    messages: loaded.messages.clone(),
+                }
+            } else {
+                loaded
+            };
+            if let Some(tx) = tx {
+                let _ = tx.send(crate::event::Event::Tick);
+            }
+        });
+
+        let kind = if fork { "forked" } else { "resumed" };
+        let short: String = id.chars().take(8).collect();
+        self.items.push(Item::Note(format!("{kind} session {}", short)));
     }
 
     fn set_region(&mut self, region: RegionConfig) {

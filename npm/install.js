@@ -21,6 +21,7 @@ const VERSION = `v${pkg.version}`;
 
 const TARGETS = {
   'darwin-arm64': 'mimo-aarch64-apple-darwin',
+  'darwin-x64':   'mimo-x86_64-apple-darwin',
   'linux-x64':    'mimo-x86_64-unknown-linux-gnu',
   'linux-arm64':  'mimo-aarch64-unknown-linux-gnu',
   'win32-x64':    'mimo-x86_64-pc-windows-msvc',
@@ -52,16 +53,21 @@ console.log(`[mimo-tui] downloading ${VERSION} (${key})`);
     const archivePath = path.join(binDir, `${targetName}.${archiveExt}`);
     await download(url, archivePath);
 
-    // SHA verify (best-effort, skip if 404)
+    // SHA verify — fail hard on mismatch, only skip if the sha file 404s.
+    let shaText;
     try {
-      const shaText = await downloadString(shaUrl);
+      shaText = await downloadString(shaUrl);
+    } catch (e) {
+      console.warn(`[mimo-tui] (sha256 file not available: ${e.message}; integrity check skipped)`);
+    }
+    if (shaText) {
       const expectedSha = shaText.split(/\s+/)[0];
       const actualSha = sha256(archivePath);
       if (expectedSha && actualSha !== expectedSha) {
+        // Hard fail — refuse to install a tampered or corrupted binary.
         throw new Error(`sha256 mismatch: got ${actualSha}, expected ${expectedSha}`);
       }
-    } catch (e) {
-      console.warn(`[mimo-tui] (skipping sha verify: ${e.message})`);
+      console.log(`[mimo-tui] sha256 verified`);
     }
 
     if (isWindows) {
@@ -92,13 +98,31 @@ console.log(`[mimo-tui] downloading ${VERSION} (${key})`);
       fs.chmodSync(binPath, 0o755);
     }
 
+    // On macOS, strip the quarantine attribute so Gatekeeper doesn't block the
+    // unsigned binary from running. Without this users see a confusing
+    // "cannot verify the developer" dialog on first launch.
+    if (process.platform === 'darwin') {
+      try {
+        spawnSync('xattr', ['-cr', binPath], { stdio: 'ignore' });
+      } catch (_) {
+        // xattr should exist on every macOS; if it doesn't, fall through.
+      }
+    }
+
     console.log(`[mimo-tui] installed → ${binPath}`);
   } catch (err) {
-    console.error(`[mimo-tui] download failed: ${err.message}`);
-    console.error(`[mimo-tui] you can grab the binary manually:`);
-    console.error(`           ${url}`);
-    console.error(`           or run: cargo install --git https://github.com/duolaAmengweb3/mimo-tui mimo-tui`);
-    process.exit(0); // don't break npm install
+    console.error('');
+    console.error(`[mimo-tui] ⚠ download FAILED: ${err.message}`);
+    console.error(`[mimo-tui] tried url: ${url}`);
+    console.error(`[mimo-tui] mimo is NOT usable until you do one of:`);
+    console.error(`           · re-run: npm install -g mimo-tui --force`);
+    console.error(`           · grab the binary manually from`);
+    console.error(`             https://github.com/duolaAmengweb3/mimo-tui/releases/latest`);
+    console.error(`           · or: cargo install --git https://github.com/duolaAmengweb3/mimo-tui mimo-tui`);
+    console.error('');
+    // Exit 0 so the npm install completes (so `which mimo` finds the wrapper),
+    // but the user sees a loud, unambiguous failure message above.
+    process.exit(0);
   }
 })();
 

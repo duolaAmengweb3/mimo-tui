@@ -97,6 +97,12 @@ impl Agent {
         let mut all_events = Vec::new();
         let mut final_text = String::new();
 
+        // Auto-compact: if the running token-count estimate exceeds the threshold,
+        // summarize older messages and drop them.
+        if let Err(e) = self.maybe_compact(&tx).await {
+            tracing::warn!(?e, "context compaction failed; continuing un-compacted");
+        }
+
         for iteration in 0..self.config.max_iterations {
             debug!(iter = iteration, "agent iteration");
 
@@ -229,6 +235,164 @@ impl Agent {
             events: all_events,
         })
     }
+
+    /// Estimate the message-history token count and, if it exceeds the
+    /// compaction threshold, ask the model to summarise older turns.
+    ///
+    /// Heuristic:
+    /// - Token estimate ≈ total UTF-8 chars / 3.5 (works for both English and CJK)
+    /// - Threshold = 70% of model context (MiMo 1M → trigger at ~700k chars)
+    /// - We keep the system prompt (unchanged), the last 4 messages verbatim,
+    ///   and replace everything older with a single synthetic
+    ///   `Message::user_text("Conversation so far:\n<summary>")`.
+    ///
+    /// The summary is generated via a non-streaming `messages` call to the
+    /// flash model so it's cheap.
+    async fn maybe_compact(&mut self, tx: &mpsc::UnboundedSender<AgentEvent>) -> Result<()> {
+        // Keep below the limit with a buffer for the system prompt + tool defs.
+        // Hard-code 200k chars (~57k tokens) as the trigger — small enough that
+        // even a 100k context model doesn't OOM, big enough that we don't
+        // compact tiny conversations.
+        const COMPACT_TRIGGER_CHARS: usize = 200_000;
+        // Always keep the last N messages so the model has the immediate
+        // working context.
+        const KEEP_TAIL: usize = 4;
+
+        let total_chars: usize = self
+            .session
+            .messages
+            .iter()
+            .map(|m| message_size_chars(m))
+            .sum();
+        if total_chars < COMPACT_TRIGGER_CHARS || self.session.messages.len() <= KEEP_TAIL + 2 {
+            return Ok(());
+        }
+
+        let split = self.session.messages.len() - KEEP_TAIL;
+        let older = self.session.messages[..split].to_vec();
+        let tail = self.session.messages[split..].to_vec();
+
+        // Build the summary prompt.
+        let conversation_dump = render_messages_for_summary(&older);
+        let mut summary_req = MessagesRequest::new("mimo-v2-flash", 1500);
+        summary_req.system = Some(SystemPrompt::Text(SUMMARIZER_SYSTEM_PROMPT.to_string()));
+        summary_req.messages.push(Message::user_text(format!(
+            "{conversation_dump}\n\n请给出一段简洁但完整的摘要，覆盖关键决定、修改过的文件、用过的工具结果。"
+        )));
+
+        let summary_text = match self.client.messages(summary_req).await {
+            Ok(r) => {
+                let _ = tx.send(AgentEvent::Usage(r.usage.clone()));
+                if let Some(db) = &self.usage_db {
+                    let _ = db.record(&r.model, &r.usage);
+                }
+                r.text()
+            }
+            Err(e) => return Err(anyhow::anyhow!(e)),
+        };
+
+        let dropped = older.len();
+        let mut new_history: Vec<Message> = Vec::with_capacity(2 + tail.len());
+        new_history.push(Message::user_text(format!(
+            "<auto-compacted-history dropped=\"{dropped}\">\n{summary_text}\n</auto-compacted-history>"
+        )));
+        new_history.extend(tail);
+        self.session.messages = new_history;
+
+        let _ = tx.send(AgentEvent::Error(format!(
+            "context auto-compacted: {} older turns summarised",
+            dropped
+        )));
+        Ok(())
+    }
+}
+
+const SUMMARIZER_SYSTEM_PROMPT: &str = r#"你是一个会话摘要器。给定一段编程 agent 与用户的对话历史，你的任务是产出一段紧凑摘要，让另一个 agent 在没有原始 messages 的情况下也能继续工作。
+
+要保留的：
+- 用户原始目标
+- 已经做了哪些关键改动（具体到文件路径）
+- 已经运行过的关键命令 + 结果
+- 已经查清楚的事实（例如某个 bug 的原因）
+- 任何待办
+
+要丢的：
+- 工具调用的中间日志
+- 重复的探索
+- 失败的尝试细节（除非含教训）
+
+输出纯文本（不要 markdown 标题）。"#;
+
+fn message_size_chars(m: &Message) -> usize {
+    match &m.content {
+        mimo_tui_anthropic_client::MessageContent::Text(t) => t.chars().count(),
+        mimo_tui_anthropic_client::MessageContent::Blocks(blocks) => blocks
+            .iter()
+            .map(|b| match b {
+                ContentBlock::Text { text, .. } => text.chars().count(),
+                ContentBlock::Thinking { thinking, .. } => thinking.chars().count(),
+                ContentBlock::ToolUse { input, .. } => {
+                    serde_json::to_string(input).map(|s| s.len()).unwrap_or(0)
+                }
+                ContentBlock::ToolResult { content, .. } => match content {
+                    ToolResultContent::Text(t) => t.chars().count(),
+                    ToolResultContent::Blocks(bs) => bs
+                        .iter()
+                        .map(|b| match b {
+                            ContentBlock::Text { text, .. } => text.chars().count(),
+                            _ => 0,
+                        })
+                        .sum(),
+                },
+                _ => 0,
+            })
+            .sum(),
+    }
+}
+
+fn render_messages_for_summary(messages: &[Message]) -> String {
+    use std::fmt::Write as _;
+    let mut out = String::new();
+    for m in messages {
+        let role = match m.role {
+            mimo_tui_anthropic_client::Role::User => "USER",
+            mimo_tui_anthropic_client::Role::Assistant => "ASSISTANT",
+        };
+        match &m.content {
+            mimo_tui_anthropic_client::MessageContent::Text(t) => {
+                let _ = writeln!(out, "[{role}] {t}");
+            }
+            mimo_tui_anthropic_client::MessageContent::Blocks(blocks) => {
+                for b in blocks {
+                    match b {
+                        ContentBlock::Text { text, .. } => {
+                            let _ = writeln!(out, "[{role}] {text}");
+                        }
+                        ContentBlock::ToolUse { name, input, .. } => {
+                            let args = serde_json::to_string(input).unwrap_or_default();
+                            let short: String = args.chars().take(200).collect();
+                            let _ = writeln!(out, "[{role}] tool_use {name} {short}");
+                        }
+                        ContentBlock::ToolResult { content, is_error, .. } => {
+                            let prefix = if *is_error { "tool_error" } else { "tool_result" };
+                            let body = match content {
+                                ToolResultContent::Text(t) => t.clone(),
+                                ToolResultContent::Blocks(_) => "<blocks>".to_string(),
+                            };
+                            let short: String = body.chars().take(200).collect();
+                            let _ = writeln!(out, "[{role}] {prefix} {short}");
+                        }
+                        ContentBlock::Thinking { thinking, .. } => {
+                            let short: String = thinking.chars().take(100).collect();
+                            let _ = writeln!(out, "[{role}] thinking {short}");
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+    }
+    out
 }
 
 /// Decode the streaming response, emitting TextDelta / ThinkingDelta events

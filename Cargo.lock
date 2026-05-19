@@ -1225,6 +1225,7 @@ name = "mimo-tui-tui"
 version = "0.3.0-alpha.1"
 dependencies = [
  "anyhow",
+ "chrono",
  "crossterm",
  "futures",
  "mimo-tui-anthropic-client",
@@ -1236,6 +1237,7 @@ dependencies = [
  "tokio",
  "tracing",
  "unicode-width 0.2.2",
+ "uuid",
 ]
 
 [[package]]

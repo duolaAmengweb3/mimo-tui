@@ -62,11 +62,12 @@ docker run -it -v "$PWD":/workspace ghcr.io/duolaamengweb3/mimo-tui:latest
 
 | 平台 | 文件名 |
 |---|---|
-| macOS arm64 (M1+) | `mimo-darwin-arm64.tar.gz` |
-| Linux x64 (glibc) | `mimo-linux-x64-gnu.tar.gz` |
-| Linux x64 (musl) | `mimo-linux-x64-musl.tar.gz` |
-| Linux arm64 | `mimo-linux-arm64.tar.gz` |
-| Windows x64 | `mimo-windows-x64.zip` |
+| macOS arm64 (M1+) | `mimo-aarch64-apple-darwin.tar.gz` |
+| macOS x64 (Intel) | `mimo-x86_64-apple-darwin.tar.gz` |
+| Linux x64 (glibc) | `mimo-x86_64-unknown-linux-gnu.tar.gz` |
+| Linux x64 (musl) | `mimo-x86_64-unknown-linux-musl.tar.gz` |
+| Linux arm64 | `mimo-aarch64-unknown-linux-gnu.tar.gz` |
+| Windows x64 | `mimo-x86_64-pc-windows-msvc.zip` |
 
 ## 验证安装
 
