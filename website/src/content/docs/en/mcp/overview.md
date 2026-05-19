@@ -1,21 +1,47 @@
 ---
 title: What is MCP
-description: "Model Context Protocol lets agents use any external tool"
+description: "Model Context Protocol lets the mimo agent use any external tool"
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+**Model Context Protocol (MCP)** is an open protocol from Anthropic that gives AI agents a uniform interface to **any** external data source or tool — filesystems, git repos, databases, APIs, design files, Slack messages...
 
-<Aside type="caution" title="v1.0 in progress">
-This feature ships with mimo-tui v1.0. This is a preview doc — full details will land alongside the v1.0 release.
-</Aside>
+mimo-tui v0.2 ships a complete MCP client, so you can **reuse any MCP server already written for Claude Code / Codex / Cursor**.
 
-## About "What is MCP"
+## Why it matters
 
-Model Context Protocol lets agents use any external tool
+Without MCP, every new integration means writing agent code with bespoke schemas. With MCP:
 
-Full spec: [PRD.md · §6.6](https://github.com/duolaAmengweb3/mimo-tui/blob/main/PRD.md).
+1. Install an MCP server (npm / pip / brew)
+2. Add one entry to `~/.mimo/mcp.json`
+3. Restart `mimo` — its tools appear, the agent can call them
 
-## Follow along
+## Current support
 
-- ⭐ [GitHub repo](https://github.com/duolaAmengweb3/mimo-tui)
-- 💬 [Discussions](https://github.com/duolaAmengweb3/mimo-tui/discussions)
+| Transport | Status |
+|---|---|
+| **stdio** (subprocess) | ✅ v0.2 |
+| streamable HTTP | ⏳ v0.3 |
+| SSE | ⏳ v0.3 |
+
+The vast majority of official MCP servers use stdio, so stdio is enough.
+
+## Native tools vs MCP tools
+
+mimo ships 8 native tools (`read_file` / `shell` / `glob` / etc.). MCP tools are **additional**, namespaced as `mcp__<server>__<tool>` to avoid clashes:
+
+```
+read_file              ← built-in
+mcp__fs__read_file     ← from MCP filesystem server
+```
+
+The model picks. Rule of thumb:
+
+- **Built-ins**: common operations (read files, run shell)
+- **MCP**: external systems (databases, advanced git, network services)
+
+## Next
+
+- [Install an MCP server](/en/mcp/installing/)
+- [Configure mcp.json](/en/mcp/configuring/)
+- [Preset server list](/en/mcp/preset-list/)
+- [Write your own](/en/mcp/writing-server/)
