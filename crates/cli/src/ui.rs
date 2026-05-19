@@ -24,18 +24,24 @@ pub fn print_banner(model: &str, region: &str) {
 }
 
 pub fn render_event(event: AgentEvent) {
+    use std::io::Write as _;
     match event {
-        AgentEvent::AssistantText(t) => {
-            print!("{}", t);
-            use std::io::Write as _;
+        AgentEvent::TextDelta(chunk) => {
+            print!("{}", chunk);
             let _ = std::io::stdout().flush();
         }
+        AgentEvent::ThinkingDelta(_) => {
+            // Quietly accumulate during stream; the full block fires Thinking at end.
+        }
+        AgentEvent::AssistantText(_) => {
+            // Already rendered piecewise via TextDelta.
+        }
         AgentEvent::Thinking(t) => {
-            // Render thinking dimmed + italics.
-            let preview: String = t.chars().take(120).collect();
-            let suffix = if t.chars().count() > 120 { "..." } else { "" };
+            // Render full thinking block dimmed + italics at end of block.
+            let preview: String = t.chars().take(160).collect();
+            let suffix = if t.chars().count() > 160 { "..." } else { "" };
             eprintln!(
-                "  {} {}{}",
+                "\n  {} {}{}",
                 "thinking".with(Color::Magenta).italic(),
                 preview.with(Color::DarkGrey).italic(),
                 suffix

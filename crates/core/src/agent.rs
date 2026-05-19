@@ -10,9 +10,10 @@
 use std::sync::Arc;
 
 use anyhow::Result;
+use futures::StreamExt;
 use mimo_tui_anthropic_client::{
-    Client, ContentBlock, Message, MessageContent, MessagesRequest, Role, StopReason, SystemPrompt,
-    ToolResultContent,
+    stream, BlockDelta, Client, ContentBlock, Message, MessageContent, MessagesRequest, Role,
+    StopReason, StreamEvent, SystemPrompt, ToolResultContent,
 };
 use mimo_tui_skills::SkillRegistry;
 use mimo_tui_tools::{ApprovalMode, ToolContext, ToolRegistry};
@@ -25,11 +26,15 @@ use crate::usage::UsageDb;
 
 #[derive(Debug, Clone)]
 pub enum AgentEvent {
+    /// Streaming text delta (one chunk; concatenate to get the full reply).
+    TextDelta(String),
+    /// Streaming thinking delta.
+    ThinkingDelta(String),
     /// Final assistant text for this turn (concatenation of all text blocks).
     AssistantText(String),
-    /// A thinking block returned by the model.
+    /// A complete thinking block (also emitted incrementally as ThinkingDelta).
     Thinking(String),
-    /// A tool was invoked. (name, args, result_output, is_error)
+    /// A tool was invoked.
     ToolCall {
         name: String,
         args: serde_json::Value,
@@ -102,10 +107,21 @@ impl Agent {
             req.system = Some(SystemPrompt::Text(sys));
             req.tools = Some(serde_json::from_value(serde_json::to_value(self.tools.as_anthropic_tools())?)?);
 
-            let resp = match self.client.messages(req).await {
+            // Streaming: start the request, decode SSE events live.
+            let raw = match self.client.messages_stream_raw(req).await {
                 Ok(r) => r,
                 Err(e) => {
                     let msg = format!("API error: {}", e);
+                    let _ = tx.send(AgentEvent::Error(msg.clone()));
+                    all_events.push(AgentEvent::Error(msg.clone()));
+                    return Ok(AgentReply { text: msg, events: all_events });
+                }
+            };
+
+            let resp = match collect_streaming(raw, &tx, &mut all_events).await {
+                Ok(r) => r,
+                Err(e) => {
+                    let msg = format!("stream error: {}", e);
                     let _ = tx.send(AgentEvent::Error(msg.clone()));
                     all_events.push(AgentEvent::Error(msg.clone()));
                     return Ok(AgentReply { text: msg, events: all_events });
@@ -119,21 +135,10 @@ impl Agent {
             let _ = tx.send(usage_event.clone());
             all_events.push(usage_event);
 
-            // Echo text + thinking blocks.
+            // Capture text blocks for final reply.
             for block in &resp.content {
-                match block {
-                    ContentBlock::Text { text, .. } => {
-                        final_text.push_str(text);
-                        let ev = AgentEvent::AssistantText(text.clone());
-                        let _ = tx.send(ev.clone());
-                        all_events.push(ev);
-                    }
-                    ContentBlock::Thinking { thinking, .. } => {
-                        let ev = AgentEvent::Thinking(thinking.clone());
-                        let _ = tx.send(ev.clone());
-                        all_events.push(ev);
-                    }
-                    _ => {}
+                if let ContentBlock::Text { text, .. } = block {
+                    final_text.push_str(text);
                 }
             }
 
@@ -203,6 +208,133 @@ impl Agent {
             text: final_text,
             events: all_events,
         })
+    }
+}
+
+/// Decode the streaming response, emitting TextDelta / ThinkingDelta events
+/// in real time, and return the assembled `MessagesResponse` when complete.
+async fn collect_streaming(
+    raw: reqwest::Response,
+    tx: &mpsc::UnboundedSender<AgentEvent>,
+    all_events: &mut Vec<AgentEvent>,
+) -> Result<mimo_tui_anthropic_client::MessagesResponse> {
+    use mimo_tui_anthropic_client::MessagesResponse;
+
+    let mut events_stream = Box::pin(stream::events(raw));
+    let mut response: Option<MessagesResponse> = None;
+    let mut blocks: Vec<ContentBlock> = Vec::new();
+    let mut text_buf: Vec<String> = Vec::new();
+    let mut thinking_buf: Vec<String> = Vec::new();
+    let mut input_buf: Vec<String> = Vec::new();
+    let mut sig_buf: Vec<String> = Vec::new();
+
+    while let Some(item) = events_stream.next().await {
+        let ev = item?;
+        match ev {
+            StreamEvent::MessageStart { message } => response = Some(message),
+            StreamEvent::ContentBlockStart { index, content_block } => {
+                let i = index as usize;
+                ensure_capacity(&mut blocks, &mut text_buf, &mut thinking_buf, &mut input_buf, &mut sig_buf, i + 1);
+                blocks[i] = content_block;
+            }
+            StreamEvent::ContentBlockDelta { index, delta } => {
+                let i = index as usize;
+                ensure_capacity(&mut blocks, &mut text_buf, &mut thinking_buf, &mut input_buf, &mut sig_buf, i + 1);
+                match delta {
+                    BlockDelta::TextDelta { text } => {
+                        text_buf[i].push_str(&text);
+                        let evt = AgentEvent::TextDelta(text);
+                        let _ = tx.send(evt.clone());
+                        all_events.push(evt);
+                    }
+                    BlockDelta::ThinkingDelta { thinking } => {
+                        thinking_buf[i].push_str(&thinking);
+                        let evt = AgentEvent::ThinkingDelta(thinking);
+                        let _ = tx.send(evt.clone());
+                        all_events.push(evt);
+                    }
+                    BlockDelta::InputJsonDelta { partial_json } => input_buf[i].push_str(&partial_json),
+                    BlockDelta::SignatureDelta { signature } => sig_buf[i].push_str(&signature),
+                }
+            }
+            StreamEvent::ContentBlockStop { index } => {
+                let i = index as usize;
+                if let Some(block) = blocks.get_mut(i) {
+                    match block {
+                        ContentBlock::Text { text, .. } => text.push_str(&text_buf[i]),
+                        ContentBlock::Thinking { thinking, signature } => {
+                            thinking.push_str(&thinking_buf[i]);
+                            if !sig_buf[i].is_empty() {
+                                *signature = sig_buf[i].clone();
+                            }
+                        }
+                        ContentBlock::ToolUse { input, .. } => {
+                            if !input_buf[i].is_empty() {
+                                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&input_buf[i]) {
+                                    *input = v;
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            StreamEvent::MessageDelta { delta, usage } => {
+                if let Some(r) = response.as_mut() {
+                    if delta.stop_reason.is_some() {
+                        r.stop_reason = delta.stop_reason;
+                    }
+                    if delta.stop_sequence.is_some() {
+                        r.stop_sequence = delta.stop_sequence;
+                    }
+                    r.usage.output_tokens = usage.output_tokens;
+                    if usage.cache_read_input_tokens > 0 {
+                        r.usage.cache_read_input_tokens = usage.cache_read_input_tokens;
+                    }
+                    if usage.cache_creation_input_tokens > 0 {
+                        r.usage.cache_creation_input_tokens = usage.cache_creation_input_tokens;
+                    }
+                }
+            }
+            StreamEvent::MessageStop => break,
+            StreamEvent::Ping => {}
+            StreamEvent::Error { error } => {
+                return Err(anyhow::anyhow!("server stream error: {}", error));
+            }
+        }
+    }
+
+    let mut r = response.unwrap_or(MessagesResponse {
+        id: String::new(),
+        kind: "message".to_string(),
+        role: Role::Assistant,
+        model: String::new(),
+        content: Vec::new(),
+        stop_reason: None,
+        stop_sequence: None,
+        usage: Default::default(),
+    });
+    r.content = blocks;
+    Ok(r)
+}
+
+fn ensure_capacity(
+    blocks: &mut Vec<ContentBlock>,
+    text_buf: &mut Vec<String>,
+    thinking_buf: &mut Vec<String>,
+    input_buf: &mut Vec<String>,
+    sig_buf: &mut Vec<String>,
+    needed: usize,
+) {
+    while blocks.len() < needed {
+        blocks.push(ContentBlock::Text {
+            text: String::new(),
+            cache_control: None,
+        });
+        text_buf.push(String::new());
+        thinking_buf.push(String::new());
+        input_buf.push(String::new());
+        sig_buf.push(String::new());
     }
 }
 
