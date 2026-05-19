@@ -23,7 +23,7 @@ pub async fn run() -> Result<()> {
     println!();
 
     // Step 1: API key.
-    println!("{} {}", "Step 1/3".with(Color::Cyan).bold(), "API Key");
+    println!("{} API Key", "Step 1/3".with(Color::Cyan).bold());
     println!("  去 https://platform.xiaomimimo.com 注册 → 控制台 → API Keys → Create");
     println!("  Sign up at platform.xiaomimimo.com → Console → API Keys → Create");
     println!();
@@ -48,11 +48,7 @@ pub async fn run() -> Result<()> {
 
     // Step 2: Region.
     println!();
-    println!(
-        "{} {}",
-        "Step 2/3".with(Color::Cyan).bold(),
-        "Region · 集群"
-    );
+    println!("{} Region · 集群", "Step 2/3".with(Color::Cyan).bold());
     println!("  Measuring latency...");
     let measurements = measure_all().await;
     for m in &measurements {
@@ -72,11 +68,7 @@ pub async fn run() -> Result<()> {
 
     // Step 3: Model.
     println!();
-    println!(
-        "{} {}",
-        "Step 3/3".with(Color::Cyan).bold(),
-        "Default model"
-    );
+    println!("{} Default model", "Step 3/3".with(Color::Cyan).bold());
     println!("  1. mimo-v2.5-pro    · trillion-MoE 编程主力 (recommended)");
     println!("  2. mimo-v2.5        · lightweight");
     println!("  3. mimo-v2-flash    · fast tier");

@@ -5,10 +5,11 @@ use std::time::Duration;
 use mimo_tui_anthropic_client::Region;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum RegionConfig {
     Cn,
+    #[default]
     Sgp,
     Ams,
 }
@@ -28,12 +29,6 @@ impl RegionConfig {
 
     pub fn all() -> [RegionConfig; 3] {
         [RegionConfig::Cn, RegionConfig::Sgp, RegionConfig::Ams]
-    }
-}
-
-impl Default for RegionConfig {
-    fn default() -> Self {
-        RegionConfig::Sgp
     }
 }
 

@@ -117,13 +117,11 @@ pub async fn collect(
                                 *signature = signature_buf[idx].clone();
                             }
                         }
-                        ContentBlock::ToolUse { input, .. } => {
-                            if !input_json_buf[idx].is_empty() {
-                                if let Ok(v) =
-                                    serde_json::from_str::<serde_json::Value>(&input_json_buf[idx])
-                                {
-                                    *input = v;
-                                }
+                        ContentBlock::ToolUse { input, .. } if !input_json_buf[idx].is_empty() => {
+                            if let Ok(v) =
+                                serde_json::from_str::<serde_json::Value>(&input_json_buf[idx])
+                            {
+                                *input = v;
                             }
                         }
                         _ => {}
