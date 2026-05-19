@@ -75,32 +75,19 @@ pub async fn run() -> Result<()> {
     println!("  4. mimo-v2-omni     · multimodal (vision)");
     let model = read_model_choice()?;
 
-    // Validate via a tiny API call.
+    // Validate via a tiny API call. MiMo Token Plan keys are sometimes scoped
+    // to a single cluster — if the chosen region rejects with 401, transparently
+    // probe the other two regions and switch to the first one that accepts.
     println!();
-    println!("  validating key against {} ...", region.label());
-    let client = Client::new(api_key.clone(), region.to_client_region());
-    match client
-        .messages(MessagesRequest::new(&model, 20).user("Reply with: OK"))
-        .await
-    {
-        Ok(_) => println!("  {} key works", "✓".with(Color::Green)),
-        Err(mimo_tui_anthropic_client::AnthropicError::Unauthorized) => {
-            eprintln!(
-                "  {} key was rejected (401). save anyway?",
-                "✗".with(Color::Red)
-            );
-            print!("    [y/N] ");
-            std::io::stdout().flush()?;
-            let mut line = String::new();
-            std::io::stdin().read_line(&mut line)?;
-            if !line.trim().eq_ignore_ascii_case("y") {
-                anyhow::bail!("aborted");
-            }
-        }
-        Err(e) => {
-            eprintln!("  {} {}", "warning:".with(Color::Yellow), e);
-        }
+    let validated_region = validate_key_with_fallback(&api_key, &model, region).await?;
+    if validated_region != region {
+        println!(
+            "  {} switched to {} (your selected region rejected the key)",
+            "→".with(Color::Yellow),
+            validated_region.label().with(Color::Green).bold(),
+        );
     }
+    let region = validated_region;
 
     // Save.
     paths::ensure_layout()?;
@@ -144,6 +131,60 @@ fn read_region(default: RegionConfig) -> Result<RegionConfig> {
         "ams" => Ok(RegionConfig::Ams),
         other => anyhow::bail!("unknown region '{}'", other),
     }
+}
+
+/// Try the user's chosen region first; if that returns 401, transparently
+/// retry the other two regions and return the first one that accepts the key.
+async fn validate_key_with_fallback(
+    api_key: &str,
+    model: &str,
+    preferred: RegionConfig,
+) -> Result<RegionConfig> {
+    let order = {
+        let mut all = vec![RegionConfig::Cn, RegionConfig::Sgp, RegionConfig::Ams];
+        all.retain(|r| *r != preferred);
+        let mut ordered = vec![preferred];
+        ordered.extend(all);
+        ordered
+    };
+
+    let mut last_err: Option<String> = None;
+    for region in order {
+        println!("  validating key against {} ...", region.label());
+        let client = Client::new(api_key.to_string(), region.to_client_region());
+        match client
+            .messages(MessagesRequest::new(model, 20).user("Reply with: OK"))
+            .await
+        {
+            Ok(_) => {
+                println!("  {} key works on {}", "✓".with(Color::Green), region.label());
+                return Ok(region);
+            }
+            Err(mimo_tui_anthropic_client::AnthropicError::Unauthorized) => {
+                eprintln!(
+                    "  {} {} rejected the key (401)",
+                    "✗".with(Color::Red),
+                    region.label()
+                );
+                last_err = Some(format!("{} returned 401", region.label()));
+                continue;
+            }
+            Err(e) => {
+                eprintln!(
+                    "  {} {} validation error: {}",
+                    "!".with(Color::Yellow),
+                    region.label(),
+                    e
+                );
+                last_err = Some(format!("{}: {}", region.label(), e));
+                continue;
+            }
+        }
+    }
+    anyhow::bail!(
+        "key didn't validate against any cluster.\n         last error: {}",
+        last_err.unwrap_or_else(|| "unknown".to_string())
+    )
 }
 
 fn read_model_choice() -> Result<String> {
