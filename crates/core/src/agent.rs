@@ -310,12 +310,22 @@ async fn collect_streaming(
                                 *signature = sig_buf[i].clone();
                             }
                         }
-                        ContentBlock::ToolUse { input, .. } => {
+                        ContentBlock::ToolUse { input, name, .. } => {
                             if !input_buf[i].is_empty() {
-                                if let Ok(v) =
-                                    serde_json::from_str::<serde_json::Value>(&input_buf[i])
-                                {
-                                    *input = v;
+                                match serde_json::from_str::<serde_json::Value>(&input_buf[i]) {
+                                    Ok(v) => *input = v,
+                                    Err(e) => {
+                                        tracing::warn!(
+                                            tool = %name,
+                                            error = ?e,
+                                            partial_json = %input_buf[i],
+                                            "tool_use input did not parse as JSON; using empty input"
+                                        );
+                                        let _ = tx.send(AgentEvent::Error(format!(
+                                            "tool_use[{}] input JSON malformed: {}",
+                                            name, e
+                                        )));
+                                    }
                                 }
                             }
                         }
