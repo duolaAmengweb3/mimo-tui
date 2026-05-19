@@ -1,27 +1,9 @@
-//! Terminal output helpers (color codes + banner + slash-command dispatch).
+//! Terminal output helpers for one-shot (`mimo -p "..."`) non-TUI mode.
 //!
-//! Phase 1 uses plain stdout + ANSI escape codes. Phase 2 will swap this for
-//! a full ratatui UI.
+//! Interactive mode uses the full ratatui TUI in `mimo-tui-tui`.
 
 use crossterm::style::{Color, Stylize};
-use mimo_tui_core::agent::{Agent, AgentEvent};
-
-const VERSION: &str = env!("CARGO_PKG_VERSION");
-
-pub fn print_banner(model: &str, region: &str) {
-    let logo = "∞".with(Color::Magenta).bold();
-    let name = "mimo-tui".with(Color::White).bold();
-    let v = format!("v{}", VERSION).with(Color::DarkGrey);
-    let m = model.with(Color::Cyan);
-    let r = region.with(Color::DarkGrey);
-    println!();
-    println!("  {logo}  {name}  {v}   ·   {m}   ·   {r}");
-    println!(
-        "  {}",
-        "ready · type /help for commands · Ctrl+D to exit".with(Color::DarkGrey)
-    );
-    println!();
-}
+use mimo_tui_core::agent::AgentEvent;
 
 pub fn render_event(event: AgentEvent) {
     use std::io::Write as _;
@@ -95,94 +77,4 @@ pub fn render_event(event: AgentEvent) {
     }
 }
 
-/// Returns `true` to keep the REPL running, `false` to exit.
-pub fn handle_slash(cmd: &str, agent: &mut Agent) -> bool {
-    let mut parts = cmd.split_whitespace();
-    let name = parts.next().unwrap_or("");
-    match name {
-        "help" | "h" | "?" => {
-            println!();
-            println!("  /help           show this help");
-            println!("  /model <name>   switch model");
-            println!("  /mode plan|agent|auto   change approval mode");
-            println!("  /region cn|sgp|ams      switch cluster");
-            println!("  /usage          show today's token usage");
-            println!("  /clear          clear screen");
-            println!("  /exit           quit");
-            println!();
-            true
-        }
-        "exit" | "quit" | "q" => false,
-        "clear" => {
-            print!("\x1B[2J\x1B[H");
-            true
-        }
-        "model" => {
-            if let Some(m) = parts.next() {
-                agent.config.model = m.to_string();
-                println!("  ✓ model → {}", m);
-            } else {
-                println!("  current model: {}", agent.config.model);
-            }
-            true
-        }
-        "mode" => {
-            use mimo_tui_core::config::AgentModeConfig;
-            match parts.next() {
-                Some("plan") => agent.config.mode = AgentModeConfig::Plan,
-                Some("agent") => agent.config.mode = AgentModeConfig::Agent,
-                Some("auto") => agent.config.mode = AgentModeConfig::Auto,
-                Some(other) => {
-                    println!("  unknown mode '{}', use plan|agent|auto", other);
-                    return true;
-                }
-                None => {
-                    println!("  current mode: {:?}", agent.config.mode);
-                    return true;
-                }
-            }
-            agent.ctx.mode = mimo_tui_core::agent::approval_mode(agent.config.mode);
-            println!("  ✓ mode → {:?}", agent.config.mode);
-            true
-        }
-        "region" => {
-            use mimo_tui_core::region::RegionConfig;
-            match parts.next() {
-                Some("cn") => agent.config.region = RegionConfig::Cn,
-                Some("sgp") => agent.config.region = RegionConfig::Sgp,
-                Some("ams") => agent.config.region = RegionConfig::Ams,
-                _ => {
-                    println!("  usage: /region cn|sgp|ams");
-                    return true;
-                }
-            }
-            // Build a fresh client at the new region.
-            if let Some(auth) = mimo_tui_core::auth::Auth::resolve().ok().flatten() {
-                agent.client = mimo_tui_anthropic_client::Client::new(
-                    auth.api_key,
-                    agent.config.region.to_client_region(),
-                );
-                println!("  ✓ region → {}", agent.config.region.label());
-            } else {
-                println!("  could not load auth — aborted");
-            }
-            true
-        }
-        "usage" => {
-            if let Ok(db) = mimo_tui_core::usage::UsageDb::open() {
-                if let Ok(t) = db.totals_today() {
-                    println!(
-                        "  today {} · calls:{} in:{} out:{} cached:{}",
-                        t.date, t.call_count, t.input_tokens, t.output_tokens, t.cache_read_tokens
-                    );
-                }
-            }
-            true
-        }
-        "" => true,
-        other => {
-            println!("  unknown command '/{}' — try /help", other);
-            true
-        }
-    }
-}
+// Slash commands are now handled by the ratatui App in mimo-tui-tui.
