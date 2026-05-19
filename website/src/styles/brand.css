@@ -1,4 +1,4 @@
-/* mimo-tui 品牌 CSS · 注入 Starlight 主题 */
+/* mimo-tui brand CSS · v0.3 home page redesign */
 
 :root {
   --sl-color-accent-low: #312e81;
@@ -7,6 +7,11 @@
 
   --sl-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
   --sl-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --mimo-grad-start: #6366F1;
+  --mimo-grad-end: #EC4899;
+  --mimo-grad-start-bright: #818CF8;
+  --mimo-grad-end-bright: #F472B6;
 }
 
 :root[data-theme='light'] {
@@ -15,47 +20,365 @@
   --sl-color-accent-high: #312e81;
 }
 
+/* =========================================================================
+   Hero — splash template top section
+   ========================================================================= */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -10% -10% auto -10%;
+  height: 70%;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.25), transparent 50%),
+    radial-gradient(circle at 70% 50%, rgba(236, 72, 153, 0.18), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero > * { position: relative; z-index: 1; }
+
+.hero img {
+  filter: drop-shadow(0 12px 40px rgba(99, 102, 241, 0.35));
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+.hero h1 {
+  background: linear-gradient(90deg, var(--mimo-grad-start-bright), var(--mimo-grad-end-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+/* Primary CTA — full gradient button with glow on hover */
+.hero .sl-link-button[data-variant='primary'],
 .sl-link-button[data-variant='primary'] {
-  background: linear-gradient(90deg, #6366F1, #EC4899);
+  background: linear-gradient(90deg, var(--mimo-grad-start), var(--mimo-grad-end));
   border: 0;
   color: #fff;
+  font-weight: 700;
   transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
 }
 
 .sl-link-button[data-variant='primary']:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.4);
 }
+
+.sl-link-button[data-variant='secondary'] {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme='light'] .sl-link-button[data-variant='secondary'] {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================================================
+   Status badges (under hero)
+   ========================================================================= */
+
+.status-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: -1rem 0 3rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-family: var(--sl-font-mono);
+  border: 1px solid transparent;
+}
+
+.badge-version {
+  background: rgba(99, 102, 241, 0.12);
+  color: #818CF8;
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.badge-platforms {
+  background: rgba(236, 72, 153, 0.12);
+  color: #F472B6;
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.badge-license {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.badge-price {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+/* =========================================================================
+   Section headings — gradient accent
+   ========================================================================= */
+
+.sl-markdown-content h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin-top: 4rem;
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.sl-markdown-content h2::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 1.4rem;
+  margin-right: 0.75rem;
+  vertical-align: -0.18rem;
+  background: linear-gradient(180deg, var(--mimo-grad-start-bright), var(--mimo-grad-end-bright));
+  border-radius: 2px;
+}
+
+/* =========================================================================
+   Tabs (install commands) — feel more substantial
+   ========================================================================= */
+
+starlight-tabs {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(20, 20, 20, 0.5);
+}
+
+[data-theme='light'] starlight-tabs {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================================================
+   Mock terminal code block — make it look like a real terminal
+   ========================================================================= */
+
+.sl-markdown-content pre {
+  font-family: var(--sl-font-mono);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  border-radius: 12px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.1);
+}
+
+.sl-markdown-content pre code {
+  font-family: var(--sl-font-mono);
+}
+
+/* =========================================================================
+   CardGrid cards — frosted glass with hover lift
+   ========================================================================= */
+
+.sl-markdown-content .card {
+  background: rgba(20, 20, 20, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+[data-theme='light'] .sl-markdown-content .card {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.sl-markdown-content .card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(129, 140, 248, 0.4);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.15);
+}
+
+/* =========================================================================
+   Metric grid (实测数据 section)
+   ========================================================================= */
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0 1.5rem;
+}
+
+.metric {
+  padding: 1.5rem 1.25rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.06));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+}
+
+[data-theme='light'] .metric {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(236, 72, 153, 0.04));
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.metric-number {
+  font-family: var(--sl-font-mono);
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--mimo-grad-start-bright), var(--mimo-grad-end-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.metric-label {
+  margin-top: 0.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.metric-detail {
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--sl-color-gray-3);
+  font-family: var(--sl-font-mono);
+  letter-spacing: -0.01em;
+}
+
+/* =========================================================================
+   Community grid (社群入口)
+   ========================================================================= */
+
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0 1.5rem;
+}
+
+.community-card {
+  display: block;
+  padding: 1.5rem 1.25rem;
+  border-radius: 14px;
+  background: rgba(20, 20, 20, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--sl-color-text) !important;
+  text-decoration: none !important;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  text-align: center;
+}
+
+[data-theme='light'] .community-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.community-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(129, 140, 248, 0.5);
+  box-shadow: 0 16px 36px rgba(99, 102, 241, 0.18);
+}
+
+.community-icon {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.community-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.community-handle {
+  font-family: var(--sl-font-mono);
+  font-size: 0.78rem;
+  color: var(--sl-color-gray-3);
+  margin-bottom: 0.75rem;
+  word-break: break-all;
+}
+
+.community-cta {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--mimo-grad-start), var(--mimo-grad-end));
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* =========================================================================
+   Comparison table — make it readable
+   ========================================================================= */
+
+.sl-markdown-content table {
+  font-size: 0.92rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sl-markdown-content table th {
+  background: rgba(99, 102, 241, 0.12);
+  font-weight: 700;
+}
+
+.sl-markdown-content table tr:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+/* =========================================================================
+   diff block (why-not section) — color +/- lines
+   ========================================================================= */
+
+.sl-markdown-content .language-diff .line {
+  display: block;
+}
+
+/* =========================================================================
+   Chinese spacing
+   ========================================================================= */
+
+:lang(zh) p,
+:lang(zh-CN) p,
+:lang(zh) li {
+  line-height: 1.8;
+}
+
+/* =========================================================================
+   Code (monospace family unification)
+   ========================================================================= */
 
 code, pre {
   font-family: var(--sl-font-mono);
 }
 
-.hero h1 {
-  background: linear-gradient(90deg, #818CF8, #F472B6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* =========================================================================
+   Footer-ish spacing
+   ========================================================================= */
 
-.badge-info {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366F1;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-
-[data-theme='dark'] .badge-info {
-  background: rgba(129, 140, 248, 0.15);
-  color: #818CF8;
-}
-
-:lang(zh) p,
-:lang(zh-CN) p,
-:lang(zh) li {
-  line-height: 1.75;
+.sl-markdown-content blockquote {
+  border-left: 3px solid var(--mimo-grad-start-bright);
+  font-style: normal;
+  background: rgba(99, 102, 241, 0.06);
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 8px 8px 0;
 }

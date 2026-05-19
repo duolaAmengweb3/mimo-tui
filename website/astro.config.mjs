@@ -30,6 +30,7 @@ export default defineConfig({
       ],
       social: {
         github: 'https://github.com/duolaAmengweb3/mimo-tui',
+        'x.com': 'https://x.com/hunterweb303',
       },
       defaultLocale: 'root',
       locales: {

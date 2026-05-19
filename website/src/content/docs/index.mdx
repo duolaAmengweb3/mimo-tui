@@ -1,9 +1,9 @@
 ---
 title: mimo-tui
-description: MiMo 模型的原创开源终端 AI 编程 agent · 像 Claude Code / Codex CLI 一样在终端跑
+description: MiMo 模型的原创开源终端 AI 编程 agent · 在终端跑 MiMo，像 Claude Code / Codex 一样
 template: splash
 hero:
-  tagline: MiMo 模型的原创开源终端 AI 编程 agent · 像 Claude Code / Codex CLI 一样在终端跑
+  tagline: 在终端跑 MiMo，像 Claude Code / Codex 一样原生 · MIT 开源 · 永久免费
   image:
     file: ../../assets/logo-dark.svg
   actions:
@@ -14,104 +14,226 @@ hero:
     - text: GitHub
       link: https://github.com/duolaAmengweb3/mimo-tui
       icon: external
-      variant: minimal
+      variant: secondary
 ---
 
-import { Card, CardGrid, Code, Tabs, TabItem } from '@astrojs/starlight/components';
+import { Card, CardGrid, Tabs, TabItem, LinkCard } from '@astrojs/starlight/components';
 
-## 5 秒看懂
+<div class="status-badges">
+  <span class="badge badge-version">v0.3.0-alpha.2</span>
+  <span class="badge badge-platforms">6 platforms</span>
+  <span class="badge badge-license">MIT</span>
+  <span class="badge badge-price">always free</span>
+</div>
 
-跟 [Claude Code](https://docs.claude.com/en/docs/claude-code)、[Codex CLI](https://github.com/openai/codex)、[Gemini CLI](https://github.com/google-gemini/gemini-cli) 一样的终端 AI 编程工具，区别是底层用**小米 MiMo 模型**。
-
-```bash
-npm install -g mimo-tui  # 装
-mimo                     # 首次启动 → 引导你配自己的 API key
-cd ~/code/my-project     # 进项目
-mimo                     # 开始用
-
-> 帮我把 Header.tsx 改成函数式组件
-> 跑 npm test 修所有报错
-> 给项目写 README
-```
-
-## 为什么用 mimo-tui 不用 Claude Code
-
-<CardGrid>
-  <Card title="省钱" icon="seti:powershell">
-    MiMo Token Plan 比 Claude Opus 便宜得多，1M 上下文还省 40-60% token
-  </Card>
-  <Card title="原生体验" icon="approve-check">
-    不用配 Claude Code 然后改环境变量套壳，装完即用
-  </Card>
-  <Card title="看得见用量" icon="bars">
-    实时知道套餐还剩多少 token、本次缓存命中省了多少
-  </Card>
-  <Card title="看得见 thinking" icon="open-book">
-    MiMo 推理过程实时渲染、可折叠展开
-  </Card>
-  <Card title="配置独立" icon="setting">
-    `~/.mimo/` vs `~/.claude/`，跟 Claude Code 并存互不污染
-  </Card>
-  <Card title="完全开源不收费" icon="heart">
-    MIT 许可，没有 Pro / 企业版，永远免费
-  </Card>
-</CardGrid>
-
-## 跟同类产品的对应关系
-
-| 产品 | 谁做的 | 底层模型 |
-|---|---|---|
-| Claude Code | Anthropic 官方 | Claude Opus / Sonnet |
-| Codex CLI | OpenAI 官方 | GPT-5 系列 |
-| Gemini CLI | Google 官方 | Gemini |
-| DeepSeek-TUI | 第三方个人 | DeepSeek V4 |
-| **mimo-tui** | **第三方开源** | **MiMo V2.5-Pro** |
-
-## 多种安装方式
+## 一行装上 · 跟 Claude Code 一样跑
 
 <Tabs>
   <TabItem label="npm">
-    ```bash
-    npm install -g mimo-tui
-    ```
+```bash
+npm install -g mimo-tui
+mimo init    # 引导配你自己的 API key
+mimo         # 进入全屏 TUI
+```
   </TabItem>
   <TabItem label="Homebrew">
-    ```bash
-    brew install mimo-tui/mimo-tui/mimo-tui
-    ```
+```bash
+brew install duolaAmengweb3/mimo-tui/mimo-tui
+mimo init
+mimo
+```
   </TabItem>
   <TabItem label="Cargo">
-    ```bash
-    cargo install mimo-tui
-    ```
+```bash
+cargo install --git https://github.com/duolaAmengweb3/mimo-tui mimo-tui
+mimo init
+mimo
+```
   </TabItem>
   <TabItem label="一键脚本">
-    ```bash
-    curl -fsSL https://mimo-tui.pages.dev/install.sh | sh
-    ```
+```bash
+curl -fsSL https://mimo-tui.pages.dev/install.sh | sh
+mimo init
+mimo
+```
   </TabItem>
   <TabItem label="Docker">
-    ```bash
-    docker run -it ghcr.io/duolaamengweb3/mimo-tui:latest
-    ```
+```bash
+docker run -it -v "$PWD":/workspace \
+  -e MIMO_API_KEY=tp-xxx \
+  ghcr.io/duolaamengweb3/mimo-tui:latest
+```
   </TabItem>
 </Tabs>
 
-## 当前状态
+## 看 mimo 干活长啥样
 
-<span class="badge-info">v1.0 准备中</span>
+```text
+∞ mimo-tui v0.3.0-alpha.2 · mimo-v2.5-pro · SGP · agent
 
-项目刚立项不久，核心 Rust 代码正在开发中。当前 npm 上只有 v0.0.1 的占位版本。
+▎ user > 把 Header.tsx 改成函数式组件，保留所有 props
 
-可以做的事情：
+  thinking 找文件 → 读原内容 → 看 props 类型 → 改写并保留
+  ✓ read_file {"path":"src/components/Header.tsx"}
+  ✓ edit_file {"path":"src/components/Header.tsx",
+                "old_string":"class Header extends Component",...}
+    edited Header.tsx (1 replacement)
+  ✓ shell {"command":"npm run typecheck"}
+    no errors found
 
-- ⭐ 在 [GitHub 仓库](https://github.com/duolaAmengweb3/mimo-tui) star 一下，关注进度
-- 📖 读 [PRD.md](https://github.com/duolaAmengweb3/mimo-tui/blob/main/PRD.md) 看完整产品规划
-- 💬 在 [Discussions](https://github.com/duolaAmengweb3/mimo-tui/discussions) 提建议
-- 🐛 v1.0 发布后用上 + [报 bug](https://github.com/duolaAmengweb3/mimo-tui/issues)
+Header.tsx 已经改成函数式组件，类型检查通过。
 
-## 完全免费，永远开源
+  usage in:1842 out:312 · cached 1568
+```
 
-不做 Pro / 团队 / 企业版。不收费、不卖数据、不投广告。每个用户用自己的 MiMo Token Plan API key。
+## 跟同类的本质区别
 
-> "MiMo" 是小米的注册商标 · 本项目与小米无官方关联
+| | 套壳 Claude Code | XIAOMI-MiMo-code | **mimo-tui** |
+|---|---|---|---|
+| 原创架构 | ❌ Anthropic 的壳 | ❌ 逆向 CCB | ✅ 从零写 |
+| 模型自我认知 | ❌ "I'm Claude" | 改了 prompt | ✅ "I'm MiMo" |
+| 配置目录 | ⚠️ 跟 Claude Code 冲突 | 独立 | ✅ `~/.mimo/` 完全独立 |
+| 法律风险 | 中（违反 Claude Code ToS）| 高（逆向）| ✅ 零（原创 + MIT） |
+| 缓存可视化 | ❌ | ❌ | ✅ 实时显示节省 token |
+| 三集群智能切换 | ❌ | ❌ | ✅ 自动测延迟 + key fallback |
+| 内置 skills | 0 | 0 | ✅ 3 个开箱即用 |
+| 流式 + thinking 渲染 | ✅ | 部分 | ✅ 实时逐 token |
+| MCP 客户端 | ✅ | 部分 | ✅ stdio + HTTP |
+| 跨平台二进制 | ✅ | TS 包 | ✅ 6 平台 Rust 单二进制 |
+| 价格 | Claude 套餐 | 免费 | ✅ 永远免费 |
+
+## v0.3 已经做到的能力
+
+<CardGrid>
+  <Card title="完整 agent loop" icon="rocket">
+    Anthropic Messages API + streaming SSE + 工具循环 + 最多 32 步迭代
+  </Card>
+  <Card title="8 个内置工具" icon="seti:powershell">
+    read / write / edit / shell / glob / grep / web_fetch / todo · 跟 Claude Code 持平
+  </Card>
+  <Card title="子 agent 并行" icon="random">
+    `task` 工具派发，最多 10 并发，复杂任务自动拆解
+  </Card>
+  <Card title="MCP 双协议" icon="puzzle">
+    stdio 和 HTTP 都支持 · 装任意官方 MCP server 立刻可用
+  </Card>
+  <Card title="Skills 兼容" icon="open-book">
+    完全兼容 Anthropic Skills 格式 · 把 `.claude/skills/` 拷过来直接用
+  </Card>
+  <Card title="3 个内置 skills" icon="approve-check">
+    python-style / rust-style / git-commits · 装完就有
+  </Card>
+  <Card title="三平台沙箱" icon="setting">
+    macOS Seatbelt / Linux Landlock / Windows Job Objects · 默认开
+  </Card>
+  <Card title="三模式审批" icon="bars">
+    Plan（只读）· Agent（审批）· Auto（YOLO）· 随时切换
+  </Card>
+  <Card title="三集群智能路由" icon="rocket">
+    CN / SGP / AMS · 自动测延迟 · key 在该集群不可用时自动切换
+  </Card>
+  <Card title="自动上下文压缩" icon="document">
+    超过阈值用 flash 模型总结老对话 · 保留最后 4 轮
+  </Card>
+  <Card title="完整 ratatui TUI" icon="laptop">
+    4 区分屏布局 · 流式渲染 · 缓存命中实时显示 · 7 个 slash 命令
+  </Card>
+  <Card title="会话管理" icon="list-format">
+    `/sessions list / resume / fork` · 自动保存到 `~/.mimo/sessions/`
+  </Card>
+</CardGrid>
+
+## 已实测端到端跑通
+
+<div class="metric-grid">
+  <div class="metric">
+    <div class="metric-number">6</div>
+    <div class="metric-label">支持平台</div>
+    <div class="metric-detail">macOS arm/x64 · Linux x64/arm64 gnu+musl · Windows x64</div>
+  </div>
+  <div class="metric">
+    <div class="metric-number">5</div>
+    <div class="metric-label">分发渠道</div>
+    <div class="metric-detail">npm · brew · cargo · docker · curl</div>
+  </div>
+  <div class="metric">
+    <div class="metric-number">102</div>
+    <div class="metric-label">文档页（中英双语）</div>
+    <div class="metric-detail">getting-started / concepts / tools / mcp / skills / ...</div>
+  </div>
+  <div class="metric">
+    <div class="metric-number">~3500</div>
+    <div class="metric-label">行 Rust 跨 7 个 crates</div>
+    <div class="metric-detail">anthropic-client / tools / core / tui / mcp / skills / sandbox</div>
+  </div>
+</div>
+
+**已用真实 MiMo Token Plan 验证过的场景**：
+
+- ✅ `mimo -p "write greet.py and run it"` → write_file + shell + Python skill 自动加 docstring
+- ✅ MCP filesystem server 13 个工具自动注册并调用（`mcp__fs__read_text_file` 等）
+- ✅ Wizard 自动跨集群 fallback（CN 401 → 切 SGP 成功）
+- ✅ macOS Seatbelt 沙箱拦截 `echo > ~/sandbox-leak.txt`
+- ✅ 子 agent 并行编排（task tool 派发）
+- ✅ Prompt 缓存命中 354K+ tokens（75 次 API call 累计）
+
+## 为什么不用 Claude Code 套壳
+
+```diff
+- 模型自我认知错乱（"I am Claude" 但你用的是 MiMo）
+- 错误信息全是 Anthropic 术语
+- 配置目录冲突（一会儿 Claude 一会儿 MiMo，开俩工具就乱）
+- 看不到 MiMo 的 thinking 字段
+- 看不到 prompt 缓存命中数据
+- 违反 Claude Code 的 ToS（用 Anthropic 工具调非 Claude 模型）
++ 原生 MiMo 体验 · 模型自我认知正确
++ 所有 UI / 命令 / 日志 MiMo 化
++ 独立配置 `~/.mimo/`，跟 Claude Code 并存互不污染
++ 实时渲染 thinking + 缓存命中
++ 完全合规：原创 + 用 MiMo 官方公开协议
+```
+
+## 装上 → 跑起来 → 加入社群
+
+<div class="community-grid">
+  <a class="community-card" href="https://github.com/duolaAmengweb3/mimo-tui" target="_blank">
+    <div class="community-icon">⭐</div>
+    <div class="community-name">GitHub</div>
+    <div class="community-handle">duolaAmengweb3/mimo-tui</div>
+    <div class="community-cta">Star + 提 issue</div>
+  </a>
+
+  <a class="community-card" href="https://x.com/hunterweb303" target="_blank">
+    <div class="community-icon">𝕏</div>
+    <div class="community-name">X / Twitter</div>
+    <div class="community-handle">@hunterweb303</div>
+    <div class="community-cta">最新版本动态</div>
+  </a>
+
+  <a class="community-card" href="https://t.me/dsa885" target="_blank">
+    <div class="community-icon">✈</div>
+    <div class="community-name">Telegram</div>
+    <div class="community-handle">t.me/dsa885</div>
+    <div class="community-cta">实时交流</div>
+  </a>
+
+  <a class="community-card" href="/docs/" target="_blank">
+    <div class="community-icon">📖</div>
+    <div class="community-name">完整文档</div>
+    <div class="community-handle">102 页 · 中英双语</div>
+    <div class="community-cta">使用手册</div>
+  </a>
+</div>
+
+## 永远免费 · 没有 Pro / 企业版
+
+mimo-tui 是 MIT 开源项目。**不收费、不卖数据、不投广告**。
+
+为什么免费？
+- 工具本身是给 MiMo Token Plan 用户做的，已经付过钱给小米了
+- 我们希望 MiMo 生态有一个像 Claude Code 一样能用的官方级体验
+- 卖给 MiMo 用户既不合理也不必要
+
+每个用户用自己的 MiMo Token Plan API key（跟 Claude Code 用各自 `ANTHROPIC_API_KEY` 一样）。
+
+> "MiMo" 是小米注册商标 · mimo-tui 是社区开源项目 · 与小米无官方关联
