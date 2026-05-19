@@ -1,0 +1,55 @@
+name: 💡 功能请求
+description: 提一个新功能 / 改进想法
+title: "[Feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢出主意！请描述你想要的功能和它解决的问题。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你遇到的问题 / 场景
+      description: 用具体的故事说，而不是直接说"应该有 X 功能"
+      placeholder: |
+        我每天用 mimo-tui 跑 X 类任务，但发现 Y 很麻烦，要 Z 步才能搞定...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 你期望的解决方案
+      placeholder: |
+        如果能 ... 就好了
+        建议命令：`mimo xxx ...`
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 你考虑过的其他方案
+      placeholder: 我试过 X、Y，但不行因为 Z
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 你认为的优先级
+      options:
+        - 低（nice to have）
+        - 中（提升日常体验）
+        - 高（每天都被这事卡住）
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 贡献意愿
+      options:
+        - label: 我愿意自己提 PR 实现
+        - label: 我愿意帮测试
+        - label: 我可以提供更多上下文

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>mimo-tui favicon · ∞</title>
+  <defs>
+    <linearGradient id="grad-m" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+  <text x="2" y="52" font-family="Inter, system-ui, sans-serif" font-size="62" font-weight="900" fill="url(#grad-m)">∞</text>
+</svg>

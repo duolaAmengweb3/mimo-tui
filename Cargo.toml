@@ -1,0 +1,83 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/cli",
+    "crates/core",
+    "crates/tools",
+    "crates/tui",
+    "crates/mcp",
+    "crates/skills",
+    "crates/sandbox",
+    "crates/anthropic-client",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.78"
+license = "MIT"
+authors = ["mimo-tui contributors"]
+repository = "https://github.com/mimo-tui/mimo-tui"
+homepage = "https://mimo-tui.pages.dev"
+description = "Native open-source terminal AI coding agent for Xiaomi MiMo"
+readme = "../../README.md"
+keywords = ["mimo", "xiaomi", "tui", "ai", "coding-agent"]
+categories = ["command-line-utilities", "development-tools"]
+
+[workspace.dependencies]
+# 异步运行时
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# HTTP / SSE
+reqwest = { version = "0.12", features = ["json", "stream", "rustls-tls"], default-features = false }
+eventsource-stream = "0.2"
+url = "2"
+
+# 序列化
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# CLI / TUI
+clap = { version = "4", features = ["derive", "env"] }
+ratatui = "0.28"
+crossterm = "0.28"
+
+# 工具
+anyhow = "1"
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+directories = "5"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+sha2 = "0.10"
+
+# 文件
+walkdir = "2"
+ignore = "0.4"
+regex = "1"
+
+# 持久化
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# workspace 内部 crates
+mimo-tui-core              = { path = "crates/core" }
+mimo-tui-tools             = { path = "crates/tools" }
+mimo-tui-tui               = { path = "crates/tui" }
+mimo-tui-mcp               = { path = "crates/mcp" }
+mimo-tui-skills            = { path = "crates/skills" }
+mimo-tui-sandbox           = { path = "crates/sandbox" }
+mimo-tui-anthropic-client  = { path = "crates/anthropic-client" }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 1

@@ -1,0 +1,25 @@
+name: ❓ 问问题
+description: 用法 / 配置 / 集成相关的问题
+title: "[Q] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **建议先去 [Discussions](https://github.com/mimo-tui/mimo-tui/discussions) 问，那里更适合讨论。**
+        > 如果你确认这是个会被反复问到、应该补进文档的问题，再开 issue。
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 你的问题
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 你已经试过 / 看过哪些文档？
+      placeholder: |
+        - 查过 https://mimo-tui.pages.dev/docs/...
+        - 搜过 issue ...

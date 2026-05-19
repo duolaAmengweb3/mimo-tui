@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <title>mimo-tui · npm icon (128x128)</title>
+  <defs>
+    <linearGradient id="grad-n" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="#0f0f0f"/>
+  <text x="64" y="96" font-family="Inter, sans-serif" font-size="100" font-weight="900" fill="url(#grad-n)" text-anchor="middle">∞</text>
+</svg>

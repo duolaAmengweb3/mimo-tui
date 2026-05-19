@@ -1,0 +1,89 @@
+name: 🐛 Bug 报告
+description: 报一个 bug
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢报 bug！请尽量详细描述，方便我们快速修。
+
+  - type: input
+    id: version
+    attributes:
+      label: mimo-tui 版本
+      description: 跑 `mimo --version` 看
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 操作系统
+      options:
+        - macOS arm64 (M1+)
+        - macOS x64 (Intel)
+        - Linux x64
+        - Linux arm64
+        - Windows x64
+        - 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: 安装方式
+      options:
+        - npm
+        - Homebrew
+        - Cargo
+        - Scoop
+        - Docker
+        - GitHub Releases 二进制
+        - install.sh 一键脚本
+        - 源码构建
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 问题描述
+      description: 发生了什么？预期是什么？
+      placeholder: 我跑 X，预期 Y，但实际 Z
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. `mimo`
+        2. 输入 ...
+        3. 看到 ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志 / 截图
+      description: |
+        日志在 `~/.mimo/logs/` 下。粘贴相关行。
+        **注意：检查并删掉日志里的 API key**。
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 自检
+      options:
+        - label: 我搜过现有 issue，没有重复
+          required: true
+        - label: 我用的是 latest 版本（或已说明用的版本）
+          required: true
+        - label: 我已删除日志中的 API key 等敏感信息
+          required: true

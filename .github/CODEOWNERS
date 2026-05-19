@@ -1,0 +1,22 @@
+# mimo-tui CODEOWNERS
+# 任何改动需要 @maintainers 评审
+
+* @mimo-tui/maintainers
+
+# Rust 核心
+/crates/core/      @mimo-tui/core
+/crates/tools/     @mimo-tui/core
+/crates/tui/       @mimo-tui/core
+/crates/anthropic-client/ @mimo-tui/core
+
+# 沙箱（高敏感）
+/crates/sandbox/   @mimo-tui/security
+
+# 官网
+/website/          @mimo-tui/docs
+
+# 文档
+/website/src/content/docs/  @mimo-tui/docs
+
+# CI / 发布
+/.github/workflows/  @mimo-tui/release

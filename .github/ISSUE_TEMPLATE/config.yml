@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions（推荐先去这儿）
+    url: https://github.com/mimo-tui/mimo-tui/discussions
+    about: 用法问题 / 想法讨论 / 经验分享
+  - name: 📖 文档
+    url: https://mimo-tui.pages.dev/docs
+    about: 完整使用手册（中英双语）
+  - name: 🔒 安全漏洞（私密）
+    url: https://github.com/mimo-tui/mimo-tui/security/advisories/new
+    about: 不要在公开 issue 报告安全漏洞，用这里
+  - name: 💬 Discord 社群
+    url: https://discord.gg/mimo-tui
+    about: 实时交流
