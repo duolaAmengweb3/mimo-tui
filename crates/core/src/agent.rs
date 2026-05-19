@@ -14,6 +14,7 @@ use mimo_tui_anthropic_client::{
     Client, ContentBlock, Message, MessageContent, MessagesRequest, Role, StopReason, SystemPrompt,
     ToolResultContent,
 };
+use mimo_tui_skills::SkillRegistry;
 use mimo_tui_tools::{ApprovalMode, ToolContext, ToolRegistry};
 use tokio::sync::mpsc;
 use tracing::debug;
@@ -54,6 +55,7 @@ pub struct Agent {
     pub ctx: ToolContext,
     pub session: Session,
     pub usage_db: Option<UsageDb>,
+    pub skills: Arc<SkillRegistry>,
 }
 
 impl Agent {
@@ -65,7 +67,13 @@ impl Agent {
             ctx,
             session,
             usage_db: UsageDb::open().ok(),
+            skills: Arc::new(SkillRegistry::new()),
         }
+    }
+
+    pub fn with_skills(mut self, skills: Arc<SkillRegistry>) -> Self {
+        self.skills = skills;
+        self
     }
 
     /// Run one user turn. Streams events through `tx` and returns the final reply.
@@ -79,7 +87,19 @@ impl Agent {
 
             let mut req = MessagesRequest::new(&self.config.model, self.config.max_tokens);
             req.messages = self.session.messages.clone();
-            req.system = Some(SystemPrompt::Text(system_prompt(self.config.language)));
+            // Inject relevant skills on the first iteration based on user input.
+            let mut sys = system_prompt(self.config.language);
+            if iteration == 0 {
+                let matched = self.skills.select_for(user_input);
+                if !matched.is_empty() {
+                    sys.push_str("\n\n");
+                    for s in matched {
+                        sys.push_str(&s.render());
+                        sys.push('\n');
+                    }
+                }
+            }
+            req.system = Some(SystemPrompt::Text(sys));
             req.tools = Some(serde_json::from_value(serde_json::to_value(self.tools.as_anthropic_tools())?)?);
 
             let resp = match self.client.messages(req).await {

@@ -1145,7 +1145,7 @@ checksum = "f8ca58f447f06ed17d5fc4043ce1b10dd205e060fb3ce5b979b8ed8e59ff3f79"
 
 [[package]]
 name = "mimo-tui"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1153,6 +1153,7 @@ dependencies = [
  "crossterm",
  "mimo-tui-anthropic-client",
  "mimo-tui-core",
+ "mimo-tui-skills",
  "mimo-tui-tools",
  "rustyline",
  "serde_json",
@@ -1163,7 +1164,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-anthropic-client"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "eventsource-stream",
@@ -1179,13 +1180,15 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-core"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
  "directories",
  "mimo-tui-anthropic-client",
+ "mimo-tui-mcp",
+ "mimo-tui-skills",
  "mimo-tui-tools",
  "reqwest",
  "rusqlite",
@@ -1200,22 +1203,22 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-mcp"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "async-trait",
- "reqwest",
  "serde",
  "serde_json",
  "thiserror 2.0.18",
  "tokio",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]
 name = "mimo-tui-sandbox"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "landlock",
@@ -1228,11 +1231,13 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-skills"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "serde",
  "serde_json",
+ "serde_yaml",
+ "tempfile",
  "tokio",
  "tracing",
  "walkdir",
@@ -1240,7 +1245,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-tools"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1259,7 +1264,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-tui"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "crossterm",
@@ -1880,6 +1885,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_yaml"
+version = "0.9.34+deprecated"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
+dependencies = [
+ "indexmap",
+ "itoa",
+ "ryu",
+ "serde",
+ "unsafe-libyaml",
+]
+
+[[package]]
 name = "sharded-slab"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2355,6 +2373,12 @@ name = "unicode-xid"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
+
+[[package]]
+name = "unsafe-libyaml"
+version = "0.2.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
 
 [[package]]
 name = "untrusted"

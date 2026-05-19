@@ -1,7 +1,7 @@
 {
   "name": "mimo-tui",
-  "version": "0.0.1",
-  "description": "Native open-source terminal AI coding agent for Xiaomi MiMo (placeholder · 占位包，v1.0 正式版即将上线)",
+  "version": "0.2.0-alpha.1",
+  "description": "Native open-source terminal AI coding agent for Xiaomi MiMo · like Claude Code / Codex CLI but for MiMo",
   "keywords": [
     "mimo",
     "xiaomi",
@@ -11,7 +11,8 @@
     "ai",
     "claude-code-alternative",
     "anthropic",
-    "mcp"
+    "mcp",
+    "agent"
   ],
   "homepage": "https://mimo-tui.pages.dev",
   "bugs": {
@@ -28,8 +29,12 @@
   },
   "files": [
     "bin/",
+    "install.js",
     "README.md"
   ],
+  "scripts": {
+    "postinstall": "node install.js || true"
+  },
   "engines": {
     "node": ">=18"
   },

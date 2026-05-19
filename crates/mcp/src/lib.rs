@@ -1,16 +1,32 @@
-//! MCP（Model Context Protocol）客户端
+//! Model Context Protocol (MCP) client.
 //!
-//! 支持三种 transport：
-//! - stdio
-//! - SSE
-//! - streamable HTTP
+//! Currently implements the **stdio transport** only — the most common transport
+//! for shipped MCP servers (e.g. `npx -y @modelcontextprotocol/server-filesystem`).
+//! `streamable-http` and `sse` will land in a follow-up.
 //!
-//! 兼容 Claude Code / Codex / Cursor 已有的 MCP server 生态。
-//!
-//! 待实现：
-//! - `transport::stdio`
-//! - `transport::sse`
-//! - `transport::http`
-//! - `protocol` —— JSON-RPC 2.0 + initialize / tools / resources / prompts
-//! - `registry` —— 已安装 MCP server 管理
-//! - `install`  —— `/mcp install <github-repo>`
+//! Spec: <https://modelcontextprotocol.io/specification>
+
+pub mod jsonrpc;
+pub mod protocol;
+pub mod stdio;
+
+pub use protocol::{McpTool, ServerCapabilities, ServerInfo};
+pub use stdio::{StdioServer, StdioServerConfig};
+
+use anyhow::Result;
+
+/// Generic MCP client interface (so we can swap transports later).
+#[async_trait::async_trait]
+pub trait McpClient: Send + Sync {
+    /// Run the protocol handshake.
+    async fn initialize(&self) -> Result<ServerInfo>;
+
+    /// List the tools advertised by the server.
+    async fn list_tools(&self) -> Result<Vec<McpTool>>;
+
+    /// Invoke a tool. Returns the textual result content.
+    async fn call_tool(&self, name: &str, args: serde_json::Value) -> Result<String>;
+
+    /// Best-effort graceful shutdown.
+    async fn shutdown(&self) -> Result<()>;
+}

@@ -12,8 +12,9 @@ use mimo_tui_core::{
     agent::{approval_mode, Agent},
     auth::Auth,
     config::Config,
-    paths,
+    load_default_skills, paths,
     session::Session,
+    McpHub,
 };
 use mimo_tui_tools::{ToolContext, ToolRegistry};
 use tokio::sync::mpsc;
@@ -147,12 +148,32 @@ async fn run_agent(one_shot: Option<String>) -> Result<()> {
     // 3. Build the agent dependencies.
     let client = Client::new(auth.api_key, config.region.to_client_region());
     let workspace = std::env::current_dir()?;
-    let tools = Arc::new(ToolRegistry::with_defaults());
+
+    // Native tools + MCP tools.
+    let mut registry = ToolRegistry::with_defaults();
+    let mcp_hub = match McpHub::init(&mut registry).await {
+        Ok(hub) => Some(hub),
+        Err(e) => {
+            eprintln!("  (mcp init warning: {})", e);
+            None
+        }
+    };
+    let mcp_count = mcp_hub.as_ref().map(|h| h.servers.len()).unwrap_or(0);
+    let tools = Arc::new(registry);
+
+    // Skills.
+    let skills = Arc::new(load_default_skills(&workspace).unwrap_or_default());
+    let skills_count = skills.len();
+
     let ctx = ToolContext::new(workspace.clone()).with_mode(approval_mode(config.mode));
     let session = Session::new(workspace.clone(), config.model.clone());
     let model_label = config.model.clone();
     let region_label = config.region.label();
-    let mut agent = Agent::new(client, config, tools, ctx, session);
+    let mut agent = Agent::new(client, config, tools, ctx, session).with_skills(skills);
+    let _mcp_guard = mcp_hub; // keeps spawned servers alive for the run
+    if mcp_count > 0 || skills_count > 0 {
+        eprintln!("  mcp servers: {} · skills: {}", mcp_count, skills_count);
+    }
 
     if let Some(prompt) = one_shot {
         return run_one_shot(&mut agent, &prompt).await;
