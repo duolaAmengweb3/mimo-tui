@@ -9,16 +9,25 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use anyhow::{Context, Result};
-use mimo_tui_mcp::{McpClient, McpTool, StdioServer, StdioServerConfig};
+use mimo_tui_mcp::{HttpServer, HttpServerConfig, McpClient, McpTool, StdioServer, StdioServerConfig};
 use mimo_tui_tools::{Tool, ToolRegistry, ToolResult};
 use tracing::{info, warn};
 
 use crate::paths;
 
+/// A single MCP server entry in `~/.mimo/mcp.json`. Either stdio (subprocess)
+/// or http (remote endpoint).
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum ServerEntry {
+    Http(HttpServerConfig),
+    Stdio(StdioServerConfig),
+}
+
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct McpConfig {
     #[serde(default)]
-    pub servers: HashMap<String, StdioServerConfig>,
+    pub servers: HashMap<String, ServerEntry>,
 }
 
 /// Lifetime owner for spawned MCP servers + registered tools.
@@ -40,9 +49,16 @@ impl McpHub {
 
         let mut servers: Vec<Arc<dyn McpClient>> = Vec::new();
         for (name, server_cfg) in cfg.servers {
-            match StdioServer::spawn(name.clone(), server_cfg).await {
-                Ok(srv) => {
-                    let client: Arc<dyn McpClient> = Arc::new(srv);
+            let spawn_result: Result<Arc<dyn McpClient>> = match server_cfg {
+                ServerEntry::Stdio(cfg) => StdioServer::spawn(name.clone(), cfg)
+                    .await
+                    .map(|s| Arc::new(s) as Arc<dyn McpClient>),
+                ServerEntry::Http(cfg) => {
+                    HttpServer::new(name.clone(), cfg).map(|s| Arc::new(s) as Arc<dyn McpClient>)
+                }
+            };
+            match spawn_result {
+                Ok(client) => {
                     match client.initialize().await {
                         Ok(info) => {
                             info!(server = %name, version = %info.version, "MCP initialized");
@@ -119,7 +135,7 @@ impl Tool for McpToolAdapter {
 }
 
 /// For convenience: list configured MCP servers without spawning.
-pub fn list_configured() -> Result<Vec<(String, StdioServerConfig)>> {
+pub fn list_configured() -> Result<Vec<(String, ServerEntry)>> {
     let p = paths::mimo_dir()?.join("mcp.json");
     if !p.exists() {
         return Ok(Vec::new());

@@ -65,6 +65,14 @@ impl Tool for Shell {
         let mut cmd = tokio::process::Command::new("/bin/sh");
         cmd.arg("-c").arg(&command).current_dir(&ctx.workspace);
 
+        // Apply platform sandbox unless we're in Auto mode (user opted in to YOLO).
+        if ctx.mode != ApprovalMode::Auto {
+            let policy = mimo_tui_sandbox::Policy::workspace_only(ctx.workspace.clone());
+            if let Err(e) = mimo_tui_sandbox::apply(&mut cmd, &policy) {
+                tracing::warn!(?e, "sandbox apply failed; running unsandboxed");
+            }
+        }
+
         let fut = cmd.output();
         let output = match timeout(Duration::from_secs(timeout_secs), fut).await {
             Ok(Ok(o)) => o,

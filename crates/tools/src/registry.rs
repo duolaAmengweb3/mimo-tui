@@ -5,6 +5,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use crate::task::ToolRegistryProvider;
 use crate::Tool;
 use crate::{
     edit_file::EditFile, glob_tool::GlobTool, grep_tool::GrepTool, read_file::ReadFile,
@@ -68,5 +69,27 @@ impl ToolRegistry {
 impl Default for ToolRegistry {
     fn default() -> Self {
         Self::with_defaults()
+    }
+}
+
+/// A wrapper that lets the `task` tool see the parent ToolRegistry's contents
+/// at dispatch time. We snapshot the tools on construction; new tools added
+/// after `TaskTool` was built won't be visible to sub-agents (acceptable for
+/// v0.3 — agent boot order is deterministic).
+pub struct StaticRegistry {
+    tools: Vec<Arc<dyn Tool>>,
+}
+
+impl StaticRegistry {
+    pub fn from_registry(reg: &ToolRegistry) -> Self {
+        Self {
+            tools: reg.tools.values().cloned().collect(),
+        }
+    }
+}
+
+impl ToolRegistryProvider for StaticRegistry {
+    fn tools(&self) -> Vec<Arc<dyn Tool>> {
+        self.tools.clone()
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "mimo-tui",
-  "version": "0.2.0-alpha.3",
+  "version": "0.3.0-alpha.1",
   "description": "Native open-source terminal AI coding agent for Xiaomi MiMo · like Claude Code / Codex CLI but for MiMo",
   "keywords": [
     "mimo",
@@ -25,7 +25,7 @@
   "license": "MIT",
   "author": "mimo-tui contributors",
   "bin": {
-    "mimo": "./bin/mimo.js"
+    "mimo": "bin/mimo.js"
   },
   "files": [
     "bin/",

@@ -24,11 +24,13 @@ pub mod grep_tool;
 pub mod read_file;
 pub mod registry;
 pub mod shell;
+pub mod task;
 pub mod todo;
 pub mod web_fetch;
 pub mod write_file;
 
-pub use registry::ToolRegistry;
+pub use registry::{StaticRegistry, ToolRegistry};
+pub use task::{TaskTool, ToolRegistryProvider};
 
 /// Result of a tool invocation. Mirrors the Anthropic `tool_result` shape.
 #[derive(Debug, Clone, Serialize, Deserialize)]

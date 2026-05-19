@@ -6,10 +6,12 @@
 //!
 //! Spec: <https://modelcontextprotocol.io/specification>
 
+pub mod http;
 pub mod jsonrpc;
 pub mod protocol;
 pub mod stdio;
 
+pub use http::{HttpServer, HttpServerConfig};
 pub use protocol::{McpTool, ServerCapabilities, ServerInfo};
 pub use stdio::{StdioServer, StdioServerConfig};
 

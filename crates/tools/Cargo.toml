@@ -6,6 +6,8 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+mimo-tui-anthropic-client.workspace = true
+mimo-tui-sandbox.workspace = true
 tokio = { workspace = true, features = ["full", "process"] }
 serde.workspace = true
 serde_json.workspace = true

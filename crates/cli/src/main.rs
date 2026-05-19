@@ -131,7 +131,7 @@ fn show_usage() -> Result<()> {
 
 async fn run_agent(one_shot: Option<String>) -> Result<()> {
     // 1. Auth resolution: env → file → wizard.
-    let auth = match Auth::resolve()? {
+    let _auth = match Auth::resolve()? {
         Some(a) => a,
         None => {
             println!("(no API key configured yet — running first-run wizard)\n");
@@ -140,86 +140,31 @@ async fn run_agent(one_shot: Option<String>) -> Result<()> {
         }
     };
 
-    // 2. Config
+    if let Some(prompt) = one_shot {
+        return run_one_shot_path(prompt).await;
+    }
+
+    // Interactive: full-screen ratatui TUI.
+    mimo_tui_tui::run().await
+}
+
+/// One-shot path: rebuilds a minimal agent and runs a single turn, printing
+/// streamed output to stdout (no TUI). Useful for scripting / CI.
+async fn run_one_shot_path(prompt: String) -> Result<()> {
+    let auth = Auth::resolve()?.context("auth missing")?;
     let mut config = Config::load()?;
     config.apply_env();
-
-    // 3. Build the agent dependencies.
-    let client = Client::new(auth.api_key, config.region.to_client_region());
     let workspace = std::env::current_dir()?;
+    let client = Client::new(auth.api_key, config.region.to_client_region());
 
-    // Native tools + MCP tools.
     let mut registry = ToolRegistry::with_defaults();
-    let mcp_hub = match McpHub::init(&mut registry).await {
-        Ok(hub) => Some(hub),
-        Err(e) => {
-            eprintln!("  (mcp init warning: {})", e);
-            None
-        }
-    };
-    let mcp_count = mcp_hub.as_ref().map(|h| h.servers.len()).unwrap_or(0);
+    let _mcp_hub = McpHub::init(&mut registry).await.ok();
     let tools = Arc::new(registry);
-
-    // Skills.
     let skills = Arc::new(load_default_skills(&workspace).unwrap_or_default());
-    let skills_count = skills.len();
-
     let ctx = ToolContext::new(workspace.clone()).with_mode(approval_mode(config.mode));
-    let session = Session::new(workspace.clone(), config.model.clone());
-    let model_label = config.model.clone();
-    let region_label = config.region.label();
+    let session = Session::new(workspace, config.model.clone());
     let mut agent = Agent::new(client, config, tools, ctx, session).with_skills(skills);
-    let _mcp_guard = mcp_hub; // keeps spawned servers alive for the run
-    if mcp_count > 0 || skills_count > 0 {
-        eprintln!("  mcp servers: {} · skills: {}", mcp_count, skills_count);
-    }
-
-    if let Some(prompt) = one_shot {
-        return run_one_shot(&mut agent, &prompt).await;
-    }
-
-    // 4. Interactive REPL.
-    ui::print_banner(&model_label, region_label);
-    let mut rl = rustyline::DefaultEditor::new()?;
-    loop {
-        let line = match rl.readline("∞ > ") {
-            Ok(l) => l,
-            Err(rustyline::error::ReadlineError::Interrupted)
-            | Err(rustyline::error::ReadlineError::Eof) => {
-                println!("\nbye.");
-                break;
-            }
-            Err(e) => {
-                eprintln!("readline error: {}", e);
-                break;
-            }
-        };
-        let trimmed = line.trim();
-        if trimmed.is_empty() {
-            continue;
-        }
-        let _ = rl.add_history_entry(trimmed);
-
-        if let Some(rest) = trimmed.strip_prefix('/') {
-            if ui::handle_slash(rest, &mut agent) {
-                continue;
-            } else {
-                break;
-            }
-        }
-
-        let (tx, mut rx) = mpsc::unbounded_channel();
-        let agent_fut = agent.run_turn(trimmed, tx);
-        let render_task = tokio::spawn(async move {
-            while let Some(ev) = rx.recv().await {
-                ui::render_event(ev);
-            }
-        });
-        let _ = agent_fut.await?;
-        let _ = render_task.await;
-        println!();
-    }
-    Ok(())
+    run_one_shot(&mut agent, &prompt).await
 }
 
 async fn run_one_shot(agent: &mut Agent, prompt: &str) -> Result<()> {
