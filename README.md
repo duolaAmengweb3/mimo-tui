@@ -9,8 +9,9 @@
 
 [![npm](https://img.shields.io/npm/v/mimo-tui?color=6366F1)](https://www.npmjs.com/package/mimo-tui)
 [![License](https://img.shields.io/badge/license-MIT-EC4899)](./LICENSE)
-[![Stars](https://img.shields.io/github/stars/mimo-tui/mimo-tui?style=flat&color=6366F1)](https://github.com/mimo-tui/mimo-tui)
+[![Stars](https://img.shields.io/github/stars/duolaAmengweb3/mimo-tui?style=flat&color=6366F1)](https://github.com/duolaAmengweb3/mimo-tui)
 [![Docs](https://img.shields.io/badge/docs-mimo--tui.pages.dev-EC4899)](https://mimo-tui.pages.dev)
+[![CI](https://github.com/duolaAmengweb3/mimo-tui/actions/workflows/test.yml/badge.svg)](https://github.com/duolaAmengweb3/mimo-tui/actions/workflows/test.yml)
 
 [English](#english) · [中文](#中文)
 
@@ -23,6 +24,15 @@
 ### 是什么
 
 跟 Claude Code、Codex CLI 一样的终端 AI 编程工具，区别是底层用小米 MiMo 模型。
+
+**v0.2.0-alpha 已实现** · MIT 开源永久免费：
+- ✅ 完整 agent loop（thinking 可视化 + 工具调用 + prompt 缓存）
+- ✅ 8 个内置工具：`read_file` `write_file` `edit_file` `shell` `glob` `grep` `web_fetch` `todo`
+- ✅ **MCP 客户端**：装任意 MCP server（filesystem / git / sqlite / 等），自动注册为工具
+- ✅ **Skills 系统**：兼容 Anthropic Skills 格式，可直接复用 Claude Code 的 `.claude/skills/`
+- ✅ 三集群路由（CN/SGP/AMS）+ 自动选最快
+- ✅ Plan / Agent / Auto 三种审批模式
+- ✅ 用量看板（SQLite，本地） + 缓存命中可视化
 
 ```bash
 npm install -g mimo-tui     # 装
