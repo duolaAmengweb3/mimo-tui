@@ -144,7 +144,7 @@ jobs:
           done
           ls -la docker-build
 
-      - name: Determine tag
+      - name: Determine tag + lowercase owner
         id: tag
         run: |
           if [[ -n "${{ github.event.inputs.tag }}" ]]; then
@@ -155,6 +155,9 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           # Strip leading v for docker tags
           echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          # Docker repository names must be lowercase
+          OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "owner_lower=$OWNER_LOWER" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -177,8 +180,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/mimo-tui:latest
-            ghcr.io/${{ github.repository_owner }}/mimo-tui:${{ steps.tag.outputs.version }}
+            ghcr.io/${{ steps.tag.outputs.owner_lower }}/mimo-tui:latest
+            ghcr.io/${{ steps.tag.outputs.owner_lower }}/mimo-tui:${{ steps.tag.outputs.version }}
 
   release:
     name: GitHub Release
