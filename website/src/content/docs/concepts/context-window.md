@@ -1,6 +1,6 @@
 ---
 title: 1M 上下文
-description: 如何充分利用 MiMo 的 1M 上下文 + 自动压缩
+description: "如何充分利用 MiMo 的 1M 上下文 + 自动压缩"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

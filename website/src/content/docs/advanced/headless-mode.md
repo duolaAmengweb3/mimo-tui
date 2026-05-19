@@ -1,6 +1,6 @@
 ---
 title: 非交互（headless）模式
-description: mimo --print 一次性跑完不进 TUI
+description: "mimo --print 一次性跑完不进 TUI"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

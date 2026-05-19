@@ -1,6 +1,6 @@
 ---
 title: 性能问题
-description: 卡 / 内存大 / 启动慢
+description: "卡 / 内存大 / 启动慢"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

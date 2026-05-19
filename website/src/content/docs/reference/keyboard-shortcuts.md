@@ -1,6 +1,6 @@
 ---
 title: 键盘快捷键
-description: TUI 内的所有快捷键
+description: "TUI 内的所有快捷键"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

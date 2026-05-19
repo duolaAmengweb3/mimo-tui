@@ -1,6 +1,6 @@
 ---
 title: 首次启动配置
-description: 第一次跑 mimo 会发生什么 · 配置文件存哪儿
+description: "第一次跑 mimo 会发生什么 · 配置文件存哪儿"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

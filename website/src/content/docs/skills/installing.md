@@ -1,6 +1,6 @@
 ---
 title: 安装 Skill
-description: /skill install <github-repo> 一键装
+description: "/skill install <github-repo> 一键装"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

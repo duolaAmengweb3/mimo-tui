@@ -1,6 +1,6 @@
 ---
 title: 多模型 fallback
-description: 套餐耗尽自动切到 DeepSeek / Qwen / Kimi
+description: "套餐耗尽自动切到 DeepSeek / Qwen / Kimi"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

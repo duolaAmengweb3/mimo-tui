@@ -1,6 +1,6 @@
 ---
 title: 三个集群（CN / SGP / AMS）
-description: 按延迟自动选择，或手工 /region 切换
+description: "按延迟自动选择，或手工 /region 切换"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

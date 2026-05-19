@@ -1,6 +1,6 @@
 ---
 title: 什么是 mimo-tui
-description: mimo-tui 是 MiMo 模型的原创开源终端 AI 编程 agent
+description: "mimo-tui 是 MiMo 模型的原创开源终端 AI 编程 agent"
 ---
 
 **mimo-tui** 是跑在终端里、用 MiMo 模型的 AI 编程助手。你跟它对话，它帮你读代码、改代码、跑命令、查文档、管 git——跟 Claude Code、Codex CLI、Gemini CLI 一样的工作方式，区别只是底层模型换成了小米的 MiMo。

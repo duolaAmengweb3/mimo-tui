@@ -1,6 +1,6 @@
 ---
 title: 分享 Skill 到社区
-description: 推 GitHub + topic mimo-tui-skill，自动上 Skills 市场
+description: "推 GitHub + topic mimo-tui-skill，自动上 Skills 市场"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

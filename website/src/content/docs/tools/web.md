@@ -1,6 +1,6 @@
 ---
 title: Web 工具
-description: web_fetch 抓页面、web_search 调 MiMo 原生搜索
+description: "web_fetch 抓页面、web_search 调 MiMo 原生搜索"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

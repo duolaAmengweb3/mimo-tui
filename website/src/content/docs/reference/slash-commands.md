@@ -1,6 +1,6 @@
 ---
 title: Slash 命令完整参考
-description: /help /model /region /mode /usage 等
+description: "/help /model /region /mode /usage 等"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

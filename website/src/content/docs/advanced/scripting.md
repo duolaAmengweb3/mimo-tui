@@ -1,6 +1,6 @@
 ---
 title: 在 CI/CD 里跑
-description: 非交互模式适合自动化流水线
+description: "非交互模式适合自动化流水线"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

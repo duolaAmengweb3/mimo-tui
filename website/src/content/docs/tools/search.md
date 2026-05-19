@@ -1,6 +1,6 @@
 ---
 title: 搜索（glob / grep）
-description: 找文件 / 找内容（基于 ripgrep）
+description: "找文件 / 找内容（基于 ripgrep）"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

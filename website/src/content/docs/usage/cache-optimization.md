@@ -1,6 +1,6 @@
 ---
 title: 缓存优化
-description: MiMo prompt 缓存怎么用最省 token
+description: "MiMo prompt 缓存怎么用最省 token"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

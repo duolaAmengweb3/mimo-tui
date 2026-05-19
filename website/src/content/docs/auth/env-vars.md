@@ -1,6 +1,6 @@
 ---
 title: 环境变量
-description: MIMO_API_KEY / MIMO_REGION / MIMO_MODEL 等
+description: "MIMO_API_KEY / MIMO_REGION / MIMO_MODEL 等"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

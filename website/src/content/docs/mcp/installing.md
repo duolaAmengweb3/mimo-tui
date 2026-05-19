@@ -1,6 +1,6 @@
 ---
 title: 安装 MCP Server
-description: /mcp install <github-repo> 一键装
+description: "/mcp install <github-repo> 一键装"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

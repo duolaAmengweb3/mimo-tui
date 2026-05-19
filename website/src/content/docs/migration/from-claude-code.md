@@ -1,6 +1,6 @@
 ---
 title: 从 Claude Code 迁移
-description: 把 Claude Code 的配置 / Skills / MCP 拷过来
+description: "把 Claude Code 的配置 / Skills / MCP 拷过来"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

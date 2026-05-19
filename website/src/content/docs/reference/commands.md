@@ -1,6 +1,6 @@
 ---
 title: CLI 命令完整参考
-description: mimo / mimo init / mimo auth / mimo print
+description: "mimo / mimo init / mimo auth / mimo print"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

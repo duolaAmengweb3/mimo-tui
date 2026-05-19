@@ -1,6 +1,6 @@
 ---
 title: vs XIAOMI-MiMo-code
-description: 原创 vs 逆向 / Rust vs TS / 单/多模型
+description: "原创 vs 逆向 / Rust vs TS / 单/多模型"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

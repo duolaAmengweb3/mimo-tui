@@ -1,6 +1,6 @@
 ---
 title: 工具总览
-description: mimo-tui 内置 12 个工具，跟 Claude Code 持平
+description: "mimo-tui 内置 12 个工具，跟 Claude Code 持平"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

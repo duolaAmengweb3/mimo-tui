@@ -1,6 +1,6 @@
 ---
 title: 配置 MCP
-description: 启用 / 禁用 / 参数化 MCP server
+description: "启用 / 禁用 / 参数化 MCP server"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

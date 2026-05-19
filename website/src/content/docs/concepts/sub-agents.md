@@ -1,6 +1,6 @@
 ---
 title: 子 Agent
-description: 并行最多 10 个子任务，主 agent 协调
+description: "并行最多 10 个子任务，主 agent 协调"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

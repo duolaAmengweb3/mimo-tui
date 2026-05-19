@@ -1,6 +1,6 @@
 ---
 title: config.toml 完整参考
-description: ~/.mimo/config.toml 所有配置项
+description: "~/.mimo/config.toml 所有配置项"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

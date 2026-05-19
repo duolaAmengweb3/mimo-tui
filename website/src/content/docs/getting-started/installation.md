@@ -1,6 +1,6 @@
 ---
 title: 安装
-description: 7 种方式装 mimo-tui · macOS / Linux / Windows 三平台全支持
+description: "7 种方式装 mimo-tui · macOS / Linux / Windows 三平台全支持"
 ---
 
 import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';

@@ -1,6 +1,6 @@
 ---
 title: 拿 MiMo API Key
-description: 去 platform.xiaomimimo.com 注册账号 · 拿 Token Plan 套餐
+description: "去 platform.xiaomimimo.com 注册账号 · 拿 Token Plan 套餐"
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';

@@ -1,6 +1,6 @@
 ---
 title: 写一个自己的 MCP
-description: MCP 协议简介 + 实现一个 server
+description: "MCP 协议简介 + 实现一个 server"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

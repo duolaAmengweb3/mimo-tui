@@ -1,6 +1,6 @@
 ---
 title: 三种模式（Plan / Agent / Auto）
-description: Plan 只读 / Agent 审批 / Auto 全自动
+description: "Plan 只读 / Agent 审批 / Auto 全自动"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

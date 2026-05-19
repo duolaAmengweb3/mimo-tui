@@ -1,6 +1,6 @@
 ---
 title: Shell 执行
-description: 跑 shell 命令，含审批、白名单、沙箱
+description: "跑 shell 命令，含审批、白名单、沙箱"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

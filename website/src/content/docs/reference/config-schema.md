@@ -1,6 +1,6 @@
 ---
 title: config.toml schema
-description: TOML schema + 默认值 + 校验规则
+description: "TOML schema + 默认值 + 校验规则"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

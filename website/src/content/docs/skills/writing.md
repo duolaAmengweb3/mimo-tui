@@ -1,6 +1,6 @@
 ---
 title: 编写 Skill
-description: Anthropic Skills 格式：frontmatter + markdown
+description: "Anthropic Skills 格式：frontmatter + markdown"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

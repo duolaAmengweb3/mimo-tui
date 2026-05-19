@@ -1,6 +1,6 @@
 ---
 title: 会话管理
-description: 自动保存 / 恢复 / 分叉 / 跨设备
+description: "自动保存 / 恢复 / 分叉 / 跨设备"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

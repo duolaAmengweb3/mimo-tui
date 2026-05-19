@@ -1,6 +1,6 @@
 ---
 title: 用量看板
-description: /usage 查看本日 / 本月 / 缓存命中 / 节省
+description: "/usage 查看本日 / 本月 / 缓存命中 / 节省"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

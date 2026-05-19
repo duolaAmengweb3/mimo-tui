@@ -1,6 +1,6 @@
 ---
 title: 什么是 MCP
-description: Model Context Protocol 让 AI agent 用任意外部工具
+description: "Model Context Protocol 让 AI agent 用任意外部工具"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

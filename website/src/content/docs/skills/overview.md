@@ -1,6 +1,6 @@
 ---
 title: 什么是 Skills
-description: 可组合的能力包，完全兼容 Anthropic Skills 格式
+description: "可组合的能力包，完全兼容 Anthropic Skills 格式"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

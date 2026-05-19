@@ -1,6 +1,6 @@
 ---
 title: 文件工具
-description: read_file / write_file / edit_file / apply_patch
+description: "read_file / write_file / edit_file / apply_patch"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

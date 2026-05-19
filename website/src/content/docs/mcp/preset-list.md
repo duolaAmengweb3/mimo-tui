@@ -1,6 +1,6 @@
 ---
 title: 预置 MCP 列表
-description: filesystem / git / sqlite / fetch / sequential-thinking
+description: "filesystem / git / sqlite / fetch / sequential-thinking"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

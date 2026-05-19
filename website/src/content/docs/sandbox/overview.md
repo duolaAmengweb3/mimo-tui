@@ -1,6 +1,6 @@
 ---
 title: 沙箱总览
-description: macOS Seatbelt / Linux Landlock / Windows Job Objects
+description: "macOS Seatbelt / Linux Landlock / Windows Job Objects"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

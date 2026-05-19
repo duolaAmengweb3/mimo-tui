@@ -1,6 +1,6 @@
 ---
 title: 三平台沙箱差异
-description: 每个平台的具体实现 + 限制
+description: "每个平台的具体实现 + 限制"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

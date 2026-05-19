@@ -1,6 +1,6 @@
 ---
 title: vs Claude Code
-description: 功能矩阵对比 + 选谁
+description: "功能矩阵对比 + 选谁"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

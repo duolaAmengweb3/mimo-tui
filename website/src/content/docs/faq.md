@@ -1,6 +1,6 @@
 ---
 title: 常见问题（FAQ）
-description: 20+ 个最常被问的问题
+description: "20+ 个最常被问的问题"
 ---
 
 ## 基础

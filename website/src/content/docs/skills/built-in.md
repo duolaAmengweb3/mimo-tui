@@ -1,6 +1,6 @@
 ---
 title: 内置 Skills
-description: mimo-cache-optimizer / china-dev-essentials 等
+description: "mimo-cache-optimizer / china-dev-essentials 等"
 ---
 
 import { Aside } from '@astrojs/starlight/components';

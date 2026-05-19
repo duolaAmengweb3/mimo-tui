@@ -1,6 +1,6 @@
 ---
 title: 5 分钟快速开始
-description: 从装好到跑通第一个任务
+description: "从装好到跑通第一个任务"
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';

@@ -1,6 +1,6 @@
 ---
 title: Git 工具
-description: 封装常用 git 操作
+description: "封装常用 git 操作"
 ---
 
 import { Aside } from '@astrojs/starlight/components';
