@@ -63,3 +63,4 @@ brand/png/
 # wrangler / cloudflare
 .wrangler/
 wrangler.toml.local
+dist/
