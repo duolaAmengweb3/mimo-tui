@@ -1,0 +1,117 @@
+---
+title: mimo-tui
+description: MiMo 模型的原创开源终端 AI 编程 agent · 像 Claude Code / Codex CLI 一样在终端跑
+template: splash
+hero:
+  tagline: MiMo 模型的原创开源终端 AI 编程 agent · 像 Claude Code / Codex CLI 一样在终端跑
+  image:
+    file: ../../assets/logo-dark.svg
+  actions:
+    - text: 5 分钟上手
+      link: /getting-started/quickstart/
+      icon: right-arrow
+      variant: primary
+    - text: GitHub
+      link: https://github.com/duolaAmengweb3/mimo-tui
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, Code, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## 5 秒看懂
+
+跟 [Claude Code](https://docs.claude.com/en/docs/claude-code)、[Codex CLI](https://github.com/openai/codex)、[Gemini CLI](https://github.com/google-gemini/gemini-cli) 一样的终端 AI 编程工具，区别是底层用**小米 MiMo 模型**。
+
+```bash
+npm install -g mimo-tui  # 装
+mimo                     # 首次启动 → 引导你配自己的 API key
+cd ~/code/my-project     # 进项目
+mimo                     # 开始用
+
+> 帮我把 Header.tsx 改成函数式组件
+> 跑 npm test 修所有报错
+> 给项目写 README
+```
+
+## 为什么用 mimo-tui 不用 Claude Code
+
+<CardGrid>
+  <Card title="省钱" icon="seti:powershell">
+    MiMo Token Plan 比 Claude Opus 便宜得多，1M 上下文还省 40-60% token
+  </Card>
+  <Card title="原生体验" icon="approve-check">
+    不用配 Claude Code 然后改环境变量套壳，装完即用
+  </Card>
+  <Card title="看得见用量" icon="bars">
+    实时知道套餐还剩多少 token、本次缓存命中省了多少
+  </Card>
+  <Card title="看得见 thinking" icon="open-book">
+    MiMo 推理过程实时渲染、可折叠展开
+  </Card>
+  <Card title="配置独立" icon="setting">
+    `~/.mimo/` vs `~/.claude/`，跟 Claude Code 并存互不污染
+  </Card>
+  <Card title="完全开源不收费" icon="heart">
+    MIT 许可，没有 Pro / 企业版，永远免费
+  </Card>
+</CardGrid>
+
+## 跟同类产品的对应关系
+
+| 产品 | 谁做的 | 底层模型 |
+|---|---|---|
+| Claude Code | Anthropic 官方 | Claude Opus / Sonnet |
+| Codex CLI | OpenAI 官方 | GPT-5 系列 |
+| Gemini CLI | Google 官方 | Gemini |
+| DeepSeek-TUI | 第三方个人 | DeepSeek V4 |
+| **mimo-tui** | **第三方开源** | **MiMo V2.5-Pro** |
+
+## 多种安装方式
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install -g mimo-tui
+    ```
+  </TabItem>
+  <TabItem label="Homebrew">
+    ```bash
+    brew install mimo-tui/mimo-tui/mimo-tui
+    ```
+  </TabItem>
+  <TabItem label="Cargo">
+    ```bash
+    cargo install mimo-tui
+    ```
+  </TabItem>
+  <TabItem label="一键脚本">
+    ```bash
+    curl -fsSL https://mimo-tui.pages.dev/install.sh | sh
+    ```
+  </TabItem>
+  <TabItem label="Docker">
+    ```bash
+    docker run -it ghcr.io/duolaamengweb3/mimo-tui:latest
+    ```
+  </TabItem>
+</Tabs>
+
+## 当前状态
+
+<span class="badge-info">v1.0 准备中</span>
+
+项目刚立项不久，核心 Rust 代码正在开发中。当前 npm 上只有 v0.0.1 的占位版本。
+
+可以做的事情：
+
+- ⭐ 在 [GitHub 仓库](https://github.com/duolaAmengweb3/mimo-tui) star 一下，关注进度
+- 📖 读 [PRD.md](https://github.com/duolaAmengweb3/mimo-tui/blob/main/PRD.md) 看完整产品规划
+- 💬 在 [Discussions](https://github.com/duolaAmengweb3/mimo-tui/discussions) 提建议
+- 🐛 v1.0 发布后用上 + [报 bug](https://github.com/duolaAmengweb3/mimo-tui/issues)
+
+## 完全免费，永远开源
+
+不做 Pro / 团队 / 企业版。不收费、不卖数据、不投广告。每个用户用自己的 MiMo Token Plan API key。
+
+> "MiMo" 是小米的注册商标 · 本项目与小米无官方关联

@@ -1,0 +1,117 @@
+---
+title: mimo-tui
+description: Native open-source terminal AI coding agent for Xiaomi MiMo · Just like Claude Code / Codex CLI, but for MiMo
+template: splash
+hero:
+  tagline: Native open-source terminal AI coding agent for Xiaomi MiMo · Just like Claude Code / Codex CLI, but for MiMo
+  image:
+    file: ../../../assets/logo-dark.svg
+  actions:
+    - text: 5-min Quickstart
+      link: /en/getting-started/quickstart/
+      icon: right-arrow
+      variant: primary
+    - text: GitHub
+      link: https://github.com/duolaAmengweb3/mimo-tui
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## 5-second pitch
+
+A terminal AI coding tool exactly like [Claude Code](https://docs.claude.com/en/docs/claude-code), [Codex CLI](https://github.com/openai/codex), and [Gemini CLI](https://github.com/google-gemini/gemini-cli) — except powered by **Xiaomi's MiMo model**.
+
+```bash
+npm install -g mimo-tui
+mimo                     # First run → guided setup with your own API key
+cd ~/code/my-project
+mimo
+
+> Refactor Header.tsx into a function component
+> Run npm test and fix all errors
+> Write a README for this project
+```
+
+## Why use mimo-tui instead of Claude Code
+
+<CardGrid>
+  <Card title="Cheaper" icon="seti:powershell">
+    MiMo Token Plan is significantly cheaper than Claude Opus, with 40-60% token savings on 1M context
+  </Card>
+  <Card title="Native UX" icon="approve-check">
+    No need to hack Claude Code with env vars — install and go
+  </Card>
+  <Card title="Visible usage" icon="bars">
+    Real-time view of plan token balance and cache savings per request
+  </Card>
+  <Card title="Visible thinking" icon="open-book">
+    MiMo's reasoning rendered live, collapsible
+  </Card>
+  <Card title="Isolated config" icon="setting">
+    Lives in `~/.mimo/` — coexists with Claude Code's `~/.claude/`
+  </Card>
+  <Card title="Free & Open Source" icon="heart">
+    MIT licensed. No Pro / Enterprise tier. Free forever
+  </Card>
+</CardGrid>
+
+## How it compares
+
+| Product | Who built it | Underlying model |
+|---|---|---|
+| Claude Code | Anthropic | Claude Opus / Sonnet |
+| Codex CLI | OpenAI | GPT-5 series |
+| Gemini CLI | Google | Gemini |
+| DeepSeek-TUI | Community | DeepSeek V4 |
+| **mimo-tui** | **Community / OSS** | **MiMo V2.5-Pro** |
+
+## Install
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install -g mimo-tui
+    ```
+  </TabItem>
+  <TabItem label="Homebrew">
+    ```bash
+    brew install mimo-tui/mimo-tui/mimo-tui
+    ```
+  </TabItem>
+  <TabItem label="Cargo">
+    ```bash
+    cargo install mimo-tui
+    ```
+  </TabItem>
+  <TabItem label="curl">
+    ```bash
+    curl -fsSL https://mimo-tui.pages.dev/install.sh | sh
+    ```
+  </TabItem>
+  <TabItem label="Docker">
+    ```bash
+    docker run -it ghcr.io/duolaamengweb3/mimo-tui:latest
+    ```
+  </TabItem>
+</Tabs>
+
+## Current status
+
+<span class="badge-info">v1.0 in progress</span>
+
+The project was just kicked off. Rust implementation is underway. npm currently has only the v0.0.1 placeholder.
+
+What you can do today:
+
+- ⭐ Star the [GitHub repo](https://github.com/duolaAmengweb3/mimo-tui) to follow along
+- 📖 Read [PRD.md](https://github.com/duolaAmengweb3/mimo-tui/blob/main/PRD.md) for the full product spec
+- 💬 Drop suggestions in [Discussions](https://github.com/duolaAmengweb3/mimo-tui/discussions)
+- 🐛 File bugs once v1.0 ships
+
+## Free, open forever
+
+No Pro / Team / Enterprise tier. No data collection. No ads. Every user uses their own MiMo Token Plan API key.
+
+> "MiMo" is a registered trademark of Xiaomi Corporation. This project is not affiliated with Xiaomi.
