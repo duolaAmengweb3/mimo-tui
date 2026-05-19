@@ -6,8 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
-mimo-tui-sandbox.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["full", "process"] }
 serde.workspace = true
 serde_json.workspace = true
 anyhow.workspace = true
@@ -18,3 +17,8 @@ ignore.workspace = true
 regex.workspace = true
 async-trait.workspace = true
 reqwest.workspace = true
+similar = "2.6"
+
+[dev-dependencies]
+tempfile = "3"
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

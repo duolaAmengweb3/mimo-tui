@@ -18,9 +18,14 @@ path = "src/main.rs"
 
 [dependencies]
 mimo-tui-core.workspace = true
-mimo-tui-tui.workspace = true
+mimo-tui-tools.workspace = true
+mimo-tui-anthropic-client.workspace = true
 clap.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["full"] }
 anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+serde_json.workspace = true
+async-trait.workspace = true
+rustyline = "14"
+crossterm = { workspace = true }

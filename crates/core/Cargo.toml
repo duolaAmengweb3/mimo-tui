@@ -8,9 +8,7 @@ license.workspace = true
 [dependencies]
 mimo-tui-anthropic-client.workspace = true
 mimo-tui-tools.workspace = true
-mimo-tui-mcp.workspace = true
-mimo-tui-skills.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["full"] }
 serde.workspace = true
 serde_json.workspace = true
 toml.workspace = true
@@ -22,3 +20,4 @@ chrono.workspace = true
 uuid.workspace = true
 async-trait.workspace = true
 rusqlite.workspace = true
+reqwest.workspace = true
