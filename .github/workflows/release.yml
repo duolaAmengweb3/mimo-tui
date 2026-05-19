@@ -20,6 +20,8 @@ jobs:
   build:
     name: build · ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    continue-on-error: ${{ matrix.optional == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -33,9 +35,12 @@ jobs:
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
             archive: tar.gz
+          # Intel mac runners often queue for very long. We accept that this
+          # build can fail / time out without blocking the release.
           - target: x86_64-apple-darwin
             os: macos-13
             archive: tar.gz
+            optional: true
           - target: aarch64-apple-darwin
             os: macos-latest
             archive: tar.gz
@@ -114,6 +119,9 @@ jobs:
   release:
     name: GitHub Release
     needs: build
+    # Don't block release on a single platform's queue timeout (e.g. Intel mac).
+    # Run as long as the build job didn't get fully cancelled.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
