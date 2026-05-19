@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub const PROTOCOL_VERSION: &str = "2024-11-05";
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct InitializeParams {
     pub protocol_version: &'static str,
     pub capabilities: ClientCapabilities,
