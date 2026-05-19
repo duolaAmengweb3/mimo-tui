@@ -44,7 +44,13 @@ pub fn mcp_dir() -> Result<PathBuf> {
 
 /// Ensure all standard directories exist.
 pub fn ensure_layout() -> Result<()> {
-    for dir in [mimo_dir()?, sessions_dir()?, logs_dir()?, skills_dir()?, mcp_dir()?] {
+    for dir in [
+        mimo_dir()?,
+        sessions_dir()?,
+        logs_dir()?,
+        skills_dir()?,
+        mcp_dir()?,
+    ] {
         std::fs::create_dir_all(&dir).with_context(|| format!("mkdir {}", dir.display()))?;
     }
     Ok(())

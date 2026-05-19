@@ -64,7 +64,13 @@ pub struct Agent {
 }
 
 impl Agent {
-    pub fn new(client: Client, config: Config, tools: Arc<ToolRegistry>, ctx: ToolContext, session: Session) -> Self {
+    pub fn new(
+        client: Client,
+        config: Config,
+        tools: Arc<ToolRegistry>,
+        ctx: ToolContext,
+        session: Session,
+    ) -> Self {
         Self {
             client,
             config,
@@ -82,7 +88,11 @@ impl Agent {
     }
 
     /// Run one user turn. Streams events through `tx` and returns the final reply.
-    pub async fn run_turn(&mut self, user_input: &str, tx: mpsc::UnboundedSender<AgentEvent>) -> Result<AgentReply> {
+    pub async fn run_turn(
+        &mut self,
+        user_input: &str,
+        tx: mpsc::UnboundedSender<AgentEvent>,
+    ) -> Result<AgentReply> {
         self.session.messages.push(Message::user_text(user_input));
         let mut all_events = Vec::new();
         let mut final_text = String::new();
@@ -105,7 +115,9 @@ impl Agent {
                 }
             }
             req.system = Some(SystemPrompt::Text(sys));
-            req.tools = Some(serde_json::from_value(serde_json::to_value(self.tools.as_anthropic_tools())?)?);
+            req.tools = Some(serde_json::from_value(serde_json::to_value(
+                self.tools.as_anthropic_tools(),
+            )?)?);
 
             // Streaming: start the request, decode SSE events live.
             let raw = match self.client.messages_stream_raw(req).await {
@@ -114,7 +126,10 @@ impl Agent {
                     let msg = format!("API error: {}", e);
                     let _ = tx.send(AgentEvent::Error(msg.clone()));
                     all_events.push(AgentEvent::Error(msg.clone()));
-                    return Ok(AgentReply { text: msg, events: all_events });
+                    return Ok(AgentReply {
+                        text: msg,
+                        events: all_events,
+                    });
                 }
             };
 
@@ -124,7 +139,10 @@ impl Agent {
                     let msg = format!("stream error: {}", e);
                     let _ = tx.send(AgentEvent::Error(msg.clone()));
                     all_events.push(AgentEvent::Error(msg.clone()));
-                    return Ok(AgentReply { text: msg, events: all_events });
+                    return Ok(AgentReply {
+                        text: msg,
+                        events: all_events,
+                    });
                 }
             };
 
@@ -143,7 +161,9 @@ impl Agent {
             }
 
             // Push the model's assistant message into history.
-            self.session.messages.push(Message::assistant_blocks(resp.content.clone()));
+            self.session
+                .messages
+                .push(Message::assistant_blocks(resp.content.clone()));
 
             // If we're done, return.
             let want_tools = matches!(resp.stop_reason, Some(StopReason::ToolUse));
@@ -232,14 +252,31 @@ async fn collect_streaming(
         let ev = item?;
         match ev {
             StreamEvent::MessageStart { message } => response = Some(message),
-            StreamEvent::ContentBlockStart { index, content_block } => {
+            StreamEvent::ContentBlockStart {
+                index,
+                content_block,
+            } => {
                 let i = index as usize;
-                ensure_capacity(&mut blocks, &mut text_buf, &mut thinking_buf, &mut input_buf, &mut sig_buf, i + 1);
+                ensure_capacity(
+                    &mut blocks,
+                    &mut text_buf,
+                    &mut thinking_buf,
+                    &mut input_buf,
+                    &mut sig_buf,
+                    i + 1,
+                );
                 blocks[i] = content_block;
             }
             StreamEvent::ContentBlockDelta { index, delta } => {
                 let i = index as usize;
-                ensure_capacity(&mut blocks, &mut text_buf, &mut thinking_buf, &mut input_buf, &mut sig_buf, i + 1);
+                ensure_capacity(
+                    &mut blocks,
+                    &mut text_buf,
+                    &mut thinking_buf,
+                    &mut input_buf,
+                    &mut sig_buf,
+                    i + 1,
+                );
                 match delta {
                     BlockDelta::TextDelta { text } => {
                         text_buf[i].push_str(&text);
@@ -253,7 +290,9 @@ async fn collect_streaming(
                         let _ = tx.send(evt.clone());
                         all_events.push(evt);
                     }
-                    BlockDelta::InputJsonDelta { partial_json } => input_buf[i].push_str(&partial_json),
+                    BlockDelta::InputJsonDelta { partial_json } => {
+                        input_buf[i].push_str(&partial_json)
+                    }
                     BlockDelta::SignatureDelta { signature } => sig_buf[i].push_str(&signature),
                 }
             }
@@ -262,7 +301,10 @@ async fn collect_streaming(
                 if let Some(block) = blocks.get_mut(i) {
                     match block {
                         ContentBlock::Text { text, .. } => text.push_str(&text_buf[i]),
-                        ContentBlock::Thinking { thinking, signature } => {
+                        ContentBlock::Thinking {
+                            thinking,
+                            signature,
+                        } => {
                             thinking.push_str(&thinking_buf[i]);
                             if !sig_buf[i].is_empty() {
                                 *signature = sig_buf[i].clone();
@@ -270,7 +312,9 @@ async fn collect_streaming(
                         }
                         ContentBlock::ToolUse { input, .. } => {
                             if !input_buf[i].is_empty() {
-                                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&input_buf[i]) {
+                                if let Ok(v) =
+                                    serde_json::from_str::<serde_json::Value>(&input_buf[i])
+                                {
                                     *input = v;
                                 }
                             }

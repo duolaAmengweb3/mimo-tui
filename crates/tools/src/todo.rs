@@ -71,7 +71,11 @@ impl Tool for Todo {
         })
     }
 
-    async fn run(&self, _ctx: &ToolContext, input: serde_json::Value) -> anyhow::Result<ToolResult> {
+    async fn run(
+        &self,
+        _ctx: &ToolContext,
+        input: serde_json::Value,
+    ) -> anyhow::Result<ToolResult> {
         let action: Input = serde_json::from_value(input)?;
         let mut items = self.list.items.lock().unwrap();
         match action {

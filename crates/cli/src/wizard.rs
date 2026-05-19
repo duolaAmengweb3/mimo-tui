@@ -23,11 +23,7 @@ pub async fn run() -> Result<()> {
     println!();
 
     // Step 1: API key.
-    println!(
-        "{} {}",
-        "Step 1/3".with(Color::Cyan).bold(),
-        "API Key"
-    );
+    println!("{} {}", "Step 1/3".with(Color::Cyan).bold(), "API Key");
     println!("  去 https://platform.xiaomimimo.com 注册 → 控制台 → API Keys → Create");
     println!("  Sign up at platform.xiaomimimo.com → Console → API Keys → Create");
     println!();
@@ -60,7 +56,9 @@ pub async fn run() -> Result<()> {
     println!("  Measuring latency...");
     let measurements = measure_all().await;
     for m in &measurements {
-        let ms = m.ms.map(|x| format!("{:>4} ms", x)).unwrap_or_else(|| "  fail".to_string());
+        let ms =
+            m.ms.map(|x| format!("{:>4} ms", x))
+                .unwrap_or_else(|| "  fail".to_string());
         println!("    {}  ·  {}", m.region.label(), ms);
     }
     let best = best_region(&measurements);
@@ -89,7 +87,10 @@ pub async fn run() -> Result<()> {
     println!();
     println!("  validating key against {} ...", region.label());
     let client = Client::new(api_key.clone(), region.to_client_region());
-    match client.messages(MessagesRequest::new(&model, 20).user("Reply with: OK")).await {
+    match client
+        .messages(MessagesRequest::new(&model, 20).user("Reply with: OK"))
+        .await
+    {
         Ok(_) => println!("  {} key works", "✓".with(Color::Green)),
         Err(mimo_tui_anthropic_client::AnthropicError::Unauthorized) => {
             eprintln!(
@@ -118,10 +119,7 @@ pub async fn run() -> Result<()> {
     cfg.save().context("save config")?;
 
     println!();
-    println!(
-        "  {} setup complete",
-        "✓".with(Color::Green).bold(),
-    );
+    println!("  {} setup complete", "✓".with(Color::Green).bold(),);
     println!("    key   → {}", paths::auth_file()?.display());
     println!("    config → {}", paths::config_file()?.display());
     println!();

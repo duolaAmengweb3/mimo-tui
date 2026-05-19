@@ -95,7 +95,11 @@ impl Tool for EditFile {
             "edited {} ({} replacement{})",
             path,
             occurrences.min(if replace_all { occurrences } else { 1 }),
-            if occurrences > 1 && replace_all { "s" } else { "" }
+            if occurrences > 1 && replace_all {
+                "s"
+            } else {
+                ""
+            }
         )))
     }
 }

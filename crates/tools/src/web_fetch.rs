@@ -43,7 +43,11 @@ impl Tool for WebFetch {
         })
     }
 
-    async fn run(&self, _ctx: &ToolContext, input: serde_json::Value) -> anyhow::Result<ToolResult> {
+    async fn run(
+        &self,
+        _ctx: &ToolContext,
+        input: serde_json::Value,
+    ) -> anyhow::Result<ToolResult> {
         let Input { url, max_kb } = serde_json::from_value(input)?;
         let client = reqwest::Client::builder()
             .timeout(Duration::from_secs(30))
@@ -60,15 +64,18 @@ impl Tool for WebFetch {
         };
 
         let max_bytes = max_kb * 1024;
-        let mut truncated_body = body.chars().scan(0usize, |acc, c| {
-            let n = c.len_utf8();
-            if *acc + n > max_bytes {
-                None
-            } else {
-                *acc += n;
-                Some(c)
-            }
-        }).collect::<String>();
+        let mut truncated_body = body
+            .chars()
+            .scan(0usize, |acc, c| {
+                let n = c.len_utf8();
+                if *acc + n > max_bytes {
+                    None
+                } else {
+                    *acc += n;
+                    Some(c)
+                }
+            })
+            .collect::<String>();
         if truncated_body.len() < body.len() {
             truncated_body.push_str("\n\n... (truncated)");
         }

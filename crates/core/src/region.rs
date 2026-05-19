@@ -57,10 +57,7 @@ pub async fn measure_all() -> Vec<Latency> {
 }
 
 async fn measure_one(region: RegionConfig) -> Option<u64> {
-    let url = format!(
-        "{}/v1/messages",
-        region.to_client_region().base_url()
-    );
+    let url = format!("{}/v1/messages", region.to_client_region().base_url());
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(5))
         .build()

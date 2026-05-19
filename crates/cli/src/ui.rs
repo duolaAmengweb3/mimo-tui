@@ -47,11 +47,15 @@ pub fn render_event(event: AgentEvent) {
                 suffix
             );
         }
-        AgentEvent::ToolCall { name, args, result, is_error } => {
+        AgentEvent::ToolCall {
+            name,
+            args,
+            result,
+            is_error,
+        } => {
             let icon = if is_error { "✗" } else { "✓" };
             let color = if is_error { Color::Red } else { Color::Green };
-            let args_preview = serde_json::to_string(&args)
-                .unwrap_or_default();
+            let args_preview = serde_json::to_string(&args).unwrap_or_default();
             let args_short: String = args_preview.chars().take(80).collect();
             eprintln!(
                 "  {} {} {}",
@@ -82,7 +86,11 @@ pub fn render_event(event: AgentEvent) {
             );
         }
         AgentEvent::Error(e) => {
-            eprintln!("  {} {}", "error".with(Color::Red).bold(), e.with(Color::Red));
+            eprintln!(
+                "  {} {}",
+                "error".with(Color::Red).bold(),
+                e.with(Color::Red)
+            );
         }
     }
 }

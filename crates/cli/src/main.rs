@@ -23,7 +23,7 @@ use tokio::sync::mpsc;
 #[command(
     name = "mimo",
     version,
-    about = "MiMo 模型的原创开源终端 AI 编程 agent",
+    about = "MiMo 模型的原创开源终端 AI 编程 agent"
 )]
 struct Cli {
     #[command(subcommand)]
@@ -105,7 +105,10 @@ async fn handle_auth(cmd: AuthCmd) -> Result<()> {
                     if from_env {
                         println!("✓ authenticated (key from MIMO_API_KEY env)");
                     } else {
-                        println!("✓ authenticated (key from {})", paths::auth_file()?.display());
+                        println!(
+                            "✓ authenticated (key from {})",
+                            paths::auth_file()?.display()
+                        );
                     }
                 }
                 None => println!("✗ not authenticated. run `mimo init`"),
@@ -122,10 +125,7 @@ fn show_usage() -> Result<()> {
     println!("  API calls:       {}", today.call_count);
     println!("  Input tokens:    {}", today.input_tokens);
     println!("  Output tokens:   {}", today.output_tokens);
-    println!(
-        "  Cache hit:       {} tokens",
-        today.cache_read_tokens
-    );
+    println!("  Cache hit:       {} tokens", today.cache_read_tokens);
     Ok(())
 }
 
@@ -136,8 +136,7 @@ async fn run_agent(one_shot: Option<String>) -> Result<()> {
         None => {
             println!("(no API key configured yet — running first-run wizard)\n");
             wizard::run().await?;
-            Auth::resolve()?
-                .context("auth still missing after wizard")?
+            Auth::resolve()?.context("auth still missing after wizard")?
         }
     };
 
@@ -185,7 +184,8 @@ async fn run_agent(one_shot: Option<String>) -> Result<()> {
     loop {
         let line = match rl.readline("∞ > ") {
             Ok(l) => l,
-            Err(rustyline::error::ReadlineError::Interrupted) | Err(rustyline::error::ReadlineError::Eof) => {
+            Err(rustyline::error::ReadlineError::Interrupted)
+            | Err(rustyline::error::ReadlineError::Eof) => {
                 println!("\nbye.");
                 break;
             }

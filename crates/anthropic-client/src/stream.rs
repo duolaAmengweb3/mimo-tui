@@ -12,9 +12,7 @@ use crate::error::AnthropicError;
 use crate::types::StreamEvent;
 
 /// Decode a streaming response into a stream of [`StreamEvent`]s.
-pub fn events(
-    resp: reqwest::Response,
-) -> impl Stream<Item = Result<StreamEvent, AnthropicError>> {
+pub fn events(resp: reqwest::Response) -> impl Stream<Item = Result<StreamEvent, AnthropicError>> {
     use futures::StreamExt;
 
     resp.bytes_stream()
@@ -98,7 +96,9 @@ pub async fn collect(
                     BlockDelta::InputJsonDelta { partial_json } => {
                         input_json_buf[idx].push_str(&partial_json)
                     }
-                    BlockDelta::SignatureDelta { signature } => signature_buf[idx].push_str(&signature),
+                    BlockDelta::SignatureDelta { signature } => {
+                        signature_buf[idx].push_str(&signature)
+                    }
                 }
             }
             StreamEvent::ContentBlockStop { index } => {
@@ -108,7 +108,10 @@ pub async fn collect(
                         ContentBlock::Text { text, .. } => {
                             text.push_str(&text_buf[idx]);
                         }
-                        ContentBlock::Thinking { thinking, signature } => {
+                        ContentBlock::Thinking {
+                            thinking,
+                            signature,
+                        } => {
                             thinking.push_str(&thinking_buf[idx]);
                             if !signature_buf[idx].is_empty() {
                                 *signature = signature_buf[idx].clone();
@@ -116,7 +119,9 @@ pub async fn collect(
                         }
                         ContentBlock::ToolUse { input, .. } => {
                             if !input_json_buf[idx].is_empty() {
-                                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&input_json_buf[idx]) {
+                                if let Ok(v) =
+                                    serde_json::from_str::<serde_json::Value>(&input_json_buf[idx])
+                                {
                                     *input = v;
                                 }
                             }
@@ -145,7 +150,10 @@ pub async fn collect(
             StreamEvent::MessageStop => break,
             StreamEvent::Ping => {}
             StreamEvent::Error { error } => {
-                return Err(AnthropicError::Stream(format!("server error event: {}", error)));
+                return Err(AnthropicError::Stream(format!(
+                    "server error event: {}",
+                    error
+                )));
             }
         }
     }

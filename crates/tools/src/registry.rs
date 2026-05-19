@@ -5,11 +5,11 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use crate::Tool;
 use crate::{
     edit_file::EditFile, glob_tool::GlobTool, grep_tool::GrepTool, read_file::ReadFile,
     shell::Shell, todo::Todo, web_fetch::WebFetch, write_file::WriteFile,
 };
-use crate::Tool;
 
 pub struct ToolRegistry {
     tools: HashMap<&'static str, Arc<dyn Tool>>,

@@ -30,7 +30,9 @@ impl McpHub {
     pub async fn init(registry: &mut ToolRegistry) -> Result<Self> {
         let config_path = paths::mimo_dir()?.join("mcp.json");
         if !config_path.exists() {
-            return Ok(Self { servers: Vec::new() });
+            return Ok(Self {
+                servers: Vec::new(),
+            });
         }
         let raw = std::fs::read_to_string(&config_path)
             .with_context(|| format!("read {}", config_path.display()))?;
@@ -104,7 +106,11 @@ impl Tool for McpToolAdapter {
         self.schema.clone()
     }
 
-    async fn run(&self, _ctx: &mimo_tui_tools::ToolContext, input: serde_json::Value) -> Result<ToolResult> {
+    async fn run(
+        &self,
+        _ctx: &mimo_tui_tools::ToolContext,
+        input: serde_json::Value,
+    ) -> Result<ToolResult> {
         match self.client.call_tool(&self.inner_name, input).await {
             Ok(text) => Ok(ToolResult::ok(text)),
             Err(e) => Ok(ToolResult::err(format!("mcp tool error: {}", e))),

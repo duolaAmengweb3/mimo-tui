@@ -32,7 +32,18 @@ jobs:
         working-directory: website
         run: npm run build
 
+      - name: Check Cloudflare secret
+        id: cf_check
+        run: |
+          if [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "has_token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_token=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CLOUDFLARE_API_TOKEN not configured; skipping deploy. Deploy locally with 'wrangler pages deploy website/dist --project-name=mimo-tui'."
+          fi
+
       - name: Deploy to Cloudflare Pages
+        if: steps.cf_check.outputs.has_token == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

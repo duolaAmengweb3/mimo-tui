@@ -159,7 +159,9 @@ pub enum ContentBlock {
         signature: String,
     },
     /// Redacted thinking (Anthropic spec; not commonly returned by MiMo).
-    RedactedThinking { data: String },
+    RedactedThinking {
+        data: String,
+    },
     ToolUse {
         id: String,
         name: String,
@@ -171,7 +173,9 @@ pub enum ContentBlock {
         #[serde(default, skip_serializing_if = "is_false")]
         is_error: bool,
     },
-    Image { source: ImageSource },
+    Image {
+        source: ImageSource,
+    },
 }
 
 fn is_false(b: &bool) -> bool {
@@ -188,10 +192,7 @@ pub enum ToolResultContent {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ImageSource {
-    Base64 {
-        media_type: String,
-        data: String,
-    },
+    Base64 { media_type: String, data: String },
     Url { url: String },
 }
 
@@ -285,7 +286,9 @@ impl MessagesResponse {
         self.content
             .iter()
             .filter_map(|b| match b {
-                ContentBlock::ToolUse { id, name, input } => Some((id.as_str(), name.as_str(), input)),
+                ContentBlock::ToolUse { id, name, input } => {
+                    Some((id.as_str(), name.as_str(), input))
+                }
                 _ => None,
             })
             .collect()

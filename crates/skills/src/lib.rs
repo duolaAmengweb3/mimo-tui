@@ -72,7 +72,9 @@ impl Skill {
         }
         // Heuristic: if any 4+ char word in description appears in input, match.
         for word in self.frontmatter.description.split_whitespace() {
-            let w = word.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase();
+            let w = word
+                .trim_matches(|c: char| !c.is_alphanumeric())
+                .to_lowercase();
             if w.len() >= 4 && input_l.contains(&w) {
                 return true;
             }
@@ -118,10 +120,12 @@ impl SkillRegistry {
     }
 
     pub fn load_file(path: &Path) -> Result<Skill> {
-        let raw = std::fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
+        let raw =
+            std::fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
         let (fm, body) = parse_frontmatter(&raw)
             .ok_or_else(|| anyhow!("no YAML frontmatter in {}", path.display()))?;
-        let frontmatter: SkillFrontmatter = serde_yaml::from_str(fm).with_context(|| format!("yaml in {}", path.display()))?;
+        let frontmatter: SkillFrontmatter =
+            serde_yaml::from_str(fm).with_context(|| format!("yaml in {}", path.display()))?;
         Ok(Skill {
             frontmatter,
             body: body.to_string(),
@@ -143,14 +147,19 @@ impl SkillRegistry {
 
     /// Pick the skills that should fire for `user_input`.
     pub fn select_for(&self, user_input: &str) -> Vec<&Skill> {
-        self.skills.iter().filter(|s| s.matches(user_input)).collect()
+        self.skills
+            .iter()
+            .filter(|s| s.matches(user_input))
+            .collect()
     }
 }
 
 /// Split a markdown file's YAML frontmatter from the body.
 /// Returns None if no frontmatter delimiter is present.
 fn parse_frontmatter(input: &str) -> Option<(&str, &str)> {
-    let rest = input.strip_prefix("---\n").or_else(|| input.strip_prefix("---\r\n"))?;
+    let rest = input
+        .strip_prefix("---\n")
+        .or_else(|| input.strip_prefix("---\r\n"))?;
     // Look for closing delimiter.
     let (fm, body) = if let Some(idx) = rest.find("\n---\n") {
         (&rest[..idx], &rest[idx + "\n---\n".len()..])

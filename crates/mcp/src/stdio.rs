@@ -122,7 +122,11 @@ impl StdioServer {
         &self.name
     }
 
-    async fn send_request(&self, method: &str, params: Option<serde_json::Value>) -> Result<serde_json::Value> {
+    async fn send_request(
+        &self,
+        method: &str,
+        params: Option<serde_json::Value>,
+    ) -> Result<serde_json::Value> {
         let id = {
             let mut g = self.next_id.lock().await;
             let id = *g;
@@ -152,7 +156,11 @@ impl StdioServer {
         Ok(resp.result.unwrap_or(serde_json::Value::Null))
     }
 
-    async fn send_notification(&self, method: &str, params: Option<serde_json::Value>) -> Result<()> {
+    async fn send_notification(
+        &self,
+        method: &str,
+        params: Option<serde_json::Value>,
+    ) -> Result<()> {
         let n = Notification::new(method, params);
         let raw = serde_json::to_string(&n)? + "\n";
         let mut stdin = self.stdin.lock().await;
@@ -180,7 +188,8 @@ impl McpClient for StdioServer {
             .await?;
         let parsed: InitializeResult = serde_json::from_value(result)?;
         // Tell the server we're ready.
-        self.send_notification("notifications/initialized", None).await?;
+        self.send_notification("notifications/initialized", None)
+            .await?;
 
         Ok(parsed.server_info.unwrap_or(ServerInfo {
             name: self.name.clone(),

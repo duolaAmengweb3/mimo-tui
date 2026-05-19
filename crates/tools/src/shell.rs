@@ -58,7 +58,10 @@ impl Tool for Shell {
             return Ok(ToolResult::err("user denied shell"));
         }
 
-        let Input { command, timeout_secs } = serde_json::from_value(input)?;
+        let Input {
+            command,
+            timeout_secs,
+        } = serde_json::from_value(input)?;
         let mut cmd = tokio::process::Command::new("/bin/sh");
         cmd.arg("-c").arg(&command).current_dir(&ctx.workspace);
 
@@ -66,7 +69,12 @@ impl Tool for Shell {
         let output = match timeout(Duration::from_secs(timeout_secs), fut).await {
             Ok(Ok(o)) => o,
             Ok(Err(e)) => return Ok(ToolResult::err(format!("spawn failed: {}", e))),
-            Err(_) => return Ok(ToolResult::err(format!("command timed out after {}s", timeout_secs))),
+            Err(_) => {
+                return Ok(ToolResult::err(format!(
+                    "command timed out after {}s",
+                    timeout_secs
+                )))
+            }
         };
 
         let mut combined = Vec::with_capacity(output.stdout.len() + output.stderr.len());

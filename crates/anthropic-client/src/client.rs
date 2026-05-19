@@ -156,9 +156,8 @@ impl Client {
         );
         h.insert(
             "anthropic-version",
-            HeaderValue::from_str(&self.anthropic_version).unwrap_or_else(|_| {
-                HeaderValue::from_static(ANTHROPIC_VERSION)
-            }),
+            HeaderValue::from_str(&self.anthropic_version)
+                .unwrap_or_else(|_| HeaderValue::from_static(ANTHROPIC_VERSION)),
         );
         h
     }
@@ -178,7 +177,9 @@ fn map_error(status: u16, body: String) -> AnthropicError {
 
     match status {
         401 => AnthropicError::Unauthorized,
-        429 => AnthropicError::RateLimit { retry_after_secs: None },
+        429 => AnthropicError::RateLimit {
+            retry_after_secs: None,
+        },
         500..=599 => AnthropicError::Server { status, body },
         _ => AnthropicError::Api {
             status,

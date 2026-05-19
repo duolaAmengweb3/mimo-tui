@@ -137,10 +137,7 @@ async fn live_simple_message() {
     let key = std::env::var("MIMO_API_KEY").expect("MIMO_API_KEY must be set");
     let client = Client::new(key, Region::Sgp);
     let resp = client
-        .messages(
-            MessagesRequest::new("mimo-v2.5-pro", 120)
-                .user("Reply with the single word: OK"),
-        )
+        .messages(MessagesRequest::new("mimo-v2.5-pro", 120).user("Reply with the single word: OK"))
         .await
         .expect("request should succeed");
 
@@ -158,9 +155,7 @@ async fn live_streaming() {
     let key = std::env::var("MIMO_API_KEY").expect("MIMO_API_KEY must be set");
     let client = Client::new(key, Region::Sgp);
     let resp = client
-        .messages_stream_raw(
-            MessagesRequest::new("mimo-v2.5-pro", 120).user("Count from 1 to 5"),
-        )
+        .messages_stream_raw(MessagesRequest::new("mimo-v2.5-pro", 120).user("Count from 1 to 5"))
         .await
         .expect("stream request should succeed");
 

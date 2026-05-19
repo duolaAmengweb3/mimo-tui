@@ -18,15 +18,15 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-pub mod read_file;
-pub mod write_file;
 pub mod edit_file;
-pub mod shell;
 pub mod glob_tool;
 pub mod grep_tool;
-pub mod web_fetch;
-pub mod todo;
+pub mod read_file;
 pub mod registry;
+pub mod shell;
+pub mod todo;
+pub mod web_fetch;
+pub mod write_file;
 
 pub use registry::ToolRegistry;
 

@@ -40,9 +40,9 @@ pub mod types;
 pub use client::{Client, Region};
 pub use error::{AnthropicError, Result};
 pub use types::{
-    BlockDelta, CacheControl, ContentBlock, ImageSource, Message, MessageContent,
-    MessagesRequest, MessagesResponse, Role, StopReason, StreamEvent, SystemPrompt,
-    Tool, ToolChoice, ToolResultContent, Usage,
+    BlockDelta, CacheControl, ContentBlock, ImageSource, Message, MessageContent, MessagesRequest,
+    MessagesResponse, Role, StopReason, StreamEvent, SystemPrompt, Tool, ToolChoice,
+    ToolResultContent, Usage,
 };
 
 #[cfg(test)]

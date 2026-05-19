@@ -70,11 +70,19 @@ impl Tool for ReadFile {
         let end = end.min(start + limit - 1);
 
         if start > end {
-            return Ok(ToolResult::ok(format!("(empty range) total {} lines", total)));
+            return Ok(ToolResult::ok(format!(
+                "(empty range) total {} lines",
+                total
+            )));
         }
 
         let mut out = String::with_capacity(raw.len());
-        for (idx, line) in lines.iter().enumerate().take(end).skip(start.saturating_sub(1)) {
+        for (idx, line) in lines
+            .iter()
+            .enumerate()
+            .take(end)
+            .skip(start.saturating_sub(1))
+        {
             use std::fmt::Write as _;
             let _ = writeln!(out, "{:>5}\t{}", idx + 1, line);
         }
