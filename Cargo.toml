@@ -42,7 +42,7 @@ toml = "0.8"
 
 # CLI / TUI
 clap = { version = "4", features = ["derive", "env"] }
-ratatui = "0.28"
+ratatui = "0.30"
 crossterm = { version = "0.28", features = ["event-stream"] }
 
 # 工具
