@@ -63,7 +63,6 @@ Grab the right archive from [Releases](https://github.com/duolaAmengweb3/mimo-tu
 | Platform | Filename |
 |---|---|
 | macOS arm64 (M1+) | `mimo-darwin-arm64.tar.gz` |
-| macOS x64 (Intel) | `mimo-darwin-x64.tar.gz` |
 | Linux x64 (glibc) | `mimo-linux-x64-gnu.tar.gz` |
 | Linux x64 (musl) | `mimo-linux-x64-musl.tar.gz` |
 | Linux arm64 | `mimo-linux-arm64.tar.gz` |

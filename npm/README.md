@@ -15,7 +15,6 @@ postinstall 自动从 GitHub Releases 下载对应平台二进制：
 | Platform | Binary |
 |---|---|
 | macOS arm64 (M1+) | `mimo-aarch64-apple-darwin` |
-| macOS x64 (Intel) | `mimo-x86_64-apple-darwin` |
 | Linux x64 (glibc) | `mimo-x86_64-unknown-linux-gnu` |
 | Linux arm64 | `mimo-aarch64-unknown-linux-gnu` |
 | Windows x64 | `mimo-x86_64-pc-windows-msvc` |

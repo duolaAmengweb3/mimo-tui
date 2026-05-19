@@ -23,7 +23,6 @@ body:
       label: 操作系统
       options:
         - macOS arm64 (M1+)
-        - macOS x64 (Intel)
         - Linux x64
         - Linux arm64
         - Windows x64
