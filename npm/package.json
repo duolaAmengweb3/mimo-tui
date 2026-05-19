@@ -1,0 +1,39 @@
+{
+  "name": "mimo-tui",
+  "version": "0.0.1",
+  "description": "Native open-source terminal AI coding agent for Xiaomi MiMo (placeholder · 占位包，v1.0 正式版即将上线)",
+  "keywords": [
+    "mimo",
+    "xiaomi",
+    "tui",
+    "cli",
+    "coding-agent",
+    "ai",
+    "claude-code-alternative",
+    "anthropic",
+    "mcp"
+  ],
+  "homepage": "https://mimo-tui.pages.dev",
+  "bugs": {
+    "url": "https://github.com/duolaAmengweb3/mimo-tui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duolaAmengweb3/mimo-tui.git"
+  },
+  "license": "MIT",
+  "author": "mimo-tui contributors",
+  "bin": {
+    "mimo": "./bin/mimo.js"
+  },
+  "files": [
+    "bin/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
