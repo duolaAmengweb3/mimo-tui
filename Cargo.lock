@@ -1145,7 +1145,7 @@ checksum = "f8ca58f447f06ed17d5fc4043ce1b10dd205e060fb3ce5b979b8ed8e59ff3f79"
 
 [[package]]
 name = "mimo-tui"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1164,7 +1164,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-anthropic-client"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "anyhow",
  "eventsource-stream",
@@ -1180,7 +1180,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-core"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1204,7 +1204,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-mcp"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1219,7 +1219,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-sandbox"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "anyhow",
  "landlock",
@@ -1232,7 +1232,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-skills"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "anyhow",
  "serde",
@@ -1246,7 +1246,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-tools"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1265,7 +1265,7 @@ dependencies = [
 
 [[package]]
 name = "mimo-tui-tui"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "anyhow",
  "crossterm",
