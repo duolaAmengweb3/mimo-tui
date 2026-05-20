@@ -175,8 +175,19 @@ impl Agent {
             let want_tools = matches!(resp.stop_reason, Some(StopReason::ToolUse));
             if !want_tools {
                 let _ = self.session.save();
+                let reply_text = match resp.stop_reason {
+                    Some(StopReason::MaxTokens) => format!(
+                        "{}\n\n(⚠ reply was cut off at max_tokens={}. Raise `max_tokens` in ~/.mimo/config.toml — recommended 16384 or 32768.)",
+                        final_text, self.config.max_tokens
+                    ),
+                    _ if final_text.trim().is_empty() => {
+                        "(model finished its turn without producing any text — usually means it spent the turn in `thinking`; try asking again or breaking the task into smaller steps)"
+                            .to_string()
+                    }
+                    _ => final_text.clone(),
+                };
                 return Ok(AgentReply {
-                    text: final_text.clone(),
+                    text: reply_text,
                     events: all_events,
                 });
             }
@@ -568,25 +579,59 @@ fn system_prompt(lang: Language) -> String {
         Language::Zh => {
             r#"你是 mimo-tui 的 AI 编程助手，跑在用户的终端里。底层是小米 MiMo 模型。
 
-工作方式：
+# 工作方式
 - 用户给你一个任务，你用提供的工具读代码、改代码、跑命令完成它
-- 重要操作（写文件、跑 shell）需要用户审批，遵守审批结果
+- 重要操作（写文件、跑 shell）可能需要审批，遵守审批结果
 - 任务复杂时，先用 todo 工具列计划再动手
 - 遇到不确定的事，告诉用户并问清楚，不要瞎猜
 
-每一步都要简洁。完成任务后用一两句话总结。"#
+# 持续执行（关键）
+你是一个 agent。**当用户给你一个多步任务时，必须一口气把它做完才停**，不要在中途让用户接话。
+
+绝对禁止的反模式：
+- 说"现在开始创建文件……"然后停下 → 必须紧接着调用 write_file
+- 说"接下来跑一下 npm install……"然后停下 → 必须紧接着调用 shell
+- thinking 描述了下一步，但没真的调用工具就 end turn
+
+判断什么时候才能 end turn：
+- 所有 todo 都是 done
+- 已经把最终答案/文件交付给用户
+- 真的需要用户确认的关键决策点（比如要不要覆盖一个 import 文件）
+- 出错且自己无法继续
+
+其他情况下：**继续调用工具，不要停**。
+
+# 输出风格
+每一步简洁。完成后用一两句话总结。不要在中间输出长篇旁白。"#
                 .to_string()
         }
         Language::En => {
             r#"You are mimo-tui's AI coding assistant, running in the user's terminal. Powered by Xiaomi's MiMo model.
 
-How you work:
+# How you work
 - The user gives you a task; you use the provided tools to read code, edit files, run commands
 - Destructive operations (writing files, shell commands) may require approval — respect it
 - For complex tasks, plan first using the todo tool before doing
 - When uncertain, ask the user rather than guessing
 
-Be concise at each step. Summarize in one or two sentences when done."#
+# Persistence (critical)
+You are an agent. **When the user gives you a multi-step task, finish it in one continuous turn — do not stop and hand control back to the user mid-task.**
+
+Forbidden anti-patterns:
+- Saying "Now I'll create the file…" and stopping → you MUST immediately call write_file next
+- Saying "Next I'll run npm install…" and stopping → you MUST immediately call shell next
+- Thinking about the next step but ending the turn without actually invoking the tool
+
+You may only end your turn when:
+- All todos are done
+- The final answer / artifact has been delivered
+- A real decision point that genuinely needs the user (e.g. overwrite a critical file?)
+- You hit an error you cannot recover from
+
+In every other case: **keep calling tools. Do not stop.**
+
+# Style
+Be concise at each step. One- or two-sentence summary when done. Avoid long narration between tool calls."#
                 .to_string()
         }
     }

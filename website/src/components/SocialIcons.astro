@@ -1,0 +1,58 @@
+---
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+---
+
+<a class="built-by" href="https://x.com/hunterweb303" target="_blank" rel="noopener">
+  <span class="built-by-label">built by</span>
+  <span class="built-by-handle">duola · @hunterweb303</span>
+</a>
+<Default><slot /></Default>
+
+<style>
+  .built-by {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-right: 0.85rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--sl-color-gray-5);
+    background: var(--sl-color-bg-nav);
+    font-size: 0.78rem;
+    font-family: var(--sl-font-mono, monospace);
+    color: var(--sl-color-text);
+    text-decoration: none;
+    transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+    white-space: nowrap;
+  }
+
+  .built-by:hover {
+    border-color: #8792ff;
+    transform: translateY(-1px);
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.08));
+  }
+
+  .built-by-label {
+    color: var(--sl-color-gray-3);
+    font-weight: 500;
+  }
+
+  .built-by-handle {
+    font-weight: 700;
+    background: linear-gradient(90deg, #6366f1, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Phone screens: hide the label, keep only the handle */
+  @media (max-width: 50rem) {
+    .built-by-label {
+      display: none;
+    }
+    .built-by {
+      padding: 0.2rem 0.55rem;
+      margin-right: 0.4rem;
+    }
+  }
+</style>

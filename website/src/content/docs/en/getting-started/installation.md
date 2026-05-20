@@ -5,8 +5,8 @@ description: "7 ways to install mimo-tui · macOS / Linux / Windows"
 
 import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="v1.0 in progress">
-The npm registry currently has only a v0.0.1 placeholder. Running it just prints a status message. The full v1.0 is in active development — star the [GitHub repo](https://github.com/duolaAmengweb3/mimo-tui) to follow along.
+<Aside type="note" title="Alpha stage">
+The latest release is `v0.3.0-alpha.2` and runs on all six supported platforms. Alpha is feature-complete; feedback welcome on [GitHub Issues](https://github.com/duolaAmengweb3/mimo-tui/issues).
 </Aside>
 
 ## Recommended
@@ -41,7 +41,7 @@ Auto-detects your platform and architecture, downloads the right binary from Git
 cargo install mimo-tui
 ```
 
-Builds from source locally. Requires Rust 1.78+.
+Builds from source locally. Requires Rust 1.82+.
 
 ### Scoop (Windows)
 

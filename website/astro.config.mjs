@@ -4,6 +4,7 @@ import starlight from '@astrojs/starlight';
 
 export default defineConfig({
   site: 'https://mimo-tui.pages.dev',
+  base: '/docs',
   integrations: [
     starlight({
       title: 'mimo-tui',
@@ -15,6 +16,21 @@ export default defineConfig({
       },
       favicon: '/favicon.svg',
       head: [
+        {
+          tag: 'link',
+          attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        },
+        {
+          tag: 'link',
+          attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'stylesheet',
+            href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap',
+          },
+        },
         {
           tag: 'meta',
           attrs: { property: 'og:image', content: 'https://mimo-tui.pages.dev/og-image.svg' },
@@ -38,6 +54,9 @@ export default defineConfig({
         en: { label: 'English', lang: 'en' },
       },
       customCss: ['./src/styles/brand.css'],
+      components: {
+        SocialIcons: './src/components/SocialIcons.astro',
+      },
       editLink: {
         baseUrl: 'https://github.com/duolaAmengweb3/mimo-tui/edit/main/website/',
       },

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mimo-tui · 终端原生的 MiMo 编程 agent</title>
+    <meta name="description" content="开源、MIT、永久免费。把小米 MiMo 模型用进你的终端，像 Claude Code / Codex 一样写代码、跑工具、接 MCP。">
+    <meta property="og:title" content="mimo-tui — 终端原生的 MiMo 编程 agent">
+    <meta property="og:description" content="原创开源 · 8 内置工具 · MCP 双协议 · 三平台沙箱 · 永久免费">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 滚动进度条 -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    <!-- 全局噪点纹理 -->
+    <div class="grain-overlay"></div>
+    <!-- 鼠标追光 -->
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">
+                <span class="logo-mark">∞</span>
+                <span>mimo-tui</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">能力</a></li>
+                <li><a href="#workflow">怎么用</a></li>
+                <li><a href="#installation">安装</a></li>
+                <li><a href="#about">关于</a></li>
+                <li><a href="/docs/">文档</a></li>
+                <li><a href="https://github.com/duolaAmengweb3/mimo-tui" target="_blank" rel="noopener">GitHub</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <header class="hero">
+        <div class="aurora">
+            <div class="aurora__item"></div>
+            <div class="aurora__item"></div>
+            <div class="aurora__item"></div>
+        </div>
+        <div class="hero-particles" id="particles"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badges">
+                    <span class="hero-badge">v0.3.0-alpha.2</span>
+                    <span class="hero-badge">Rust · 6 platforms</span>
+                    <span class="hero-badge">MIT</span>
+                    <span class="hero-badge">Free forever</span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">mimo-tui</span>
+                    <br>原生 MiMo 终端 agent
+                </h1>
+                <p class="hero-subtitle">
+                    把小米 MiMo 模型装进你的终端 —— 像 Claude Code、Codex 一样读代码、写代码、跑命令、接 MCP。
+                    Rust 写的，不套壳，不碰 ToS 灰区，开箱即用。
+                </p>
+                <div class="hero-buttons">
+                    <a href="#installation" class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        立即安装
+                    </a>
+                    <a href="https://github.com/duolaAmengweb3/mimo-tui" target="_blank" rel="noopener" class="btn btn-secondary">
+                        <i class="fab fa-github"></i>
+                        GitHub
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">8</span>
+                        <span class="stat-label">内置工具</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">6</span>
+                        <span class="stat-label">支持平台</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">5</span>
+                        <span class="stat-label">分发渠道</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons">
+                            <span class="btn-close"></span>
+                            <span class="btn-minimize"></span>
+                            <span class="btn-maximize"></span>
+                        </div>
+                        <div class="terminal-title">∞ mimo-tui</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line">
+                            <span class="prompt">&gt;</span>
+                            <span class="command">写一个 hello.py 并跑一下</span>
+                        </div>
+                        <div class="terminal-line response">
+                            <span class="thinking">thinking · 先创建文件，再 python 执行...</span>
+                        </div>
+                        <div class="terminal-line response">
+                            <span class="result">✓ write_file hello.py · 32 bytes</span>
+                        </div>
+                        <div class="terminal-line response">
+                            <span class="result">✓ shell · python3 hello.py</span>
+                        </div>
+                        <div class="terminal-line response">
+                            <span class="result">  Hello, mimo-tui!</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="prompt">&gt;</span>
+                            <span class="cursor">|</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 特性部分 -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">能力</h2>
+                <p class="section-subtitle">v0.3 实打实交付的部分</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>完整 agent loop</h3>
+                    <p>Anthropic Messages 协议 · 流式 SSE · 最多 32 步工具迭代 · 自动 context 压缩。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-toolbox"></i>
+                    </div>
+                    <h3>8 个内置工具</h3>
+                    <p>read · write · edit · shell · glob · grep · web_fetch · todo — 不靠 MCP 就能干活。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-random"></i>
+                    </div>
+                    <h3>子 agent 并行</h3>
+                    <p>task 工具并行最多 10 个子 agent，把长任务拆成可管理的执行单元。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h3>MCP 双协议</h3>
+                    <p>stdio + Streamable HTTP 都支持，官方 MCP server 装上就能用。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Skills 兼容</h3>
+                    <p>完全兼容 Anthropic Skills 格式，你的 `.claude/skills/*.md` 可以原样迁过来。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>三平台沙箱</h3>
+                    <p>macOS Seatbelt · Linux Landlock · Windows Job Objects —— 默认开启。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h3>智能区域路由</h3>
+                    <p>CN / SGP / AMS 三集群按延迟自动挑，区域 key 失效自动 fallback。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                    <h3>三种模式</h3>
+                    <p>Plan / Agent / Auto — 对应只读、需要审批、全自动三种风险偏好。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 工作流程部分 -->
+    <section id="workflow" class="workflow">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">怎么用</h2>
+                <p class="section-subtitle">三步进入工作状态</p>
+            </div>
+            <div class="workflow-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>安装</h3>
+                        <p>npm / brew / cargo / docker / curl 一键脚本任选一种，30 秒内完成。</p>
+                        <div class="step-example">
+                            <code>npm install -g mimo-tui</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>配 API key</h3>
+                        <p>带着你的 MiMo Token Plan key 跑一次 wizard，它会自动测三个 region 选最快的。</p>
+                        <div class="step-example">
+                            <code>mimo init</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>开始写代码</h3>
+                        <p>进 TUI 直接对话，读写文件、跑 shell、拆子任务，全部在终端里完成。</p>
+                        <div class="step-example">
+                            <code>mimo</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安装部分 -->
+    <section id="installation" class="installation">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">快速安装</h2>
+                <p class="section-subtitle">五种渠道，按你最顺手的来</p>
+            </div>
+            <div class="installation-methods">
+                <div class="method">
+                    <h3>npm（最常用）</h3>
+                    <div class="code-block">
+                        <pre><code>npm install -g mimo-tui</code></pre>
+                        <button class="copy-btn" data-clipboard-text="npm install -g mimo-tui">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="method">
+                    <h3>Homebrew</h3>
+                    <div class="code-block">
+                        <pre><code>brew install duolaAmengweb3/mimo-tui/mimo-tui</code></pre>
+                        <button class="copy-btn" data-clipboard-text="brew install duolaAmengweb3/mimo-tui/mimo-tui">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="method">
+                    <h3>Cargo（Rust 用户）</h3>
+                    <div class="code-block">
+                        <pre><code>cargo install --git https://github.com/duolaAmengweb3/mimo-tui mimo-tui</code></pre>
+                        <button class="copy-btn" data-clipboard-text="cargo install --git https://github.com/duolaAmengweb3/mimo-tui mimo-tui">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="method">
+                    <h3>一键脚本</h3>
+                    <div class="code-block">
+                        <pre><code>curl -fsSL https://mimo-tui.pages.dev/install.sh | sh</code></pre>
+                        <button class="copy-btn" data-clipboard-text="curl -fsSL https://mimo-tui.pages.dev/install.sh | sh">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="method">
+                    <h3>Docker</h3>
+                    <div class="code-block">
+                        <pre><code>docker run -it -v "$PWD":/workspace ghcr.io/duolaamengweb3/mimo-tui:latest</code></pre>
+                        <button class="copy-btn" data-clipboard-text='docker run -it -v "$PWD":/workspace ghcr.io/duolaamengweb3/mimo-tui:latest'>
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="installation-note">
+                <i class="fas fa-info-circle"></i>
+                <p>装完后跑 <code>mimo init</code> 配一次 API key，下次直接 <code>mimo</code> 就能进 TUI。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于部分 -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>关于 mimo-tui</h2>
+                    <p>mimo-tui 是一个<strong>独立的社区开源项目</strong>，目标是给 MiMo 模型生态补上一个 Claude Code / Codex CLI 水准的终端 agent。Rust 从零写，MIT 协议，不收费、不绑定托管、不二次代理你的 key。</p>
+                    <p>"MiMo" 是小米的注册商标，mimo-tui 仅调用 MiMo Token Plan 的公开 API，与小米官方无任何关联。</p>
+                    <div class="about-highlights">
+                        <div class="highlight">
+                            <i class="fas fa-code-branch"></i>
+                            <span>MIT 开源</span>
+                        </div>
+                        <div class="highlight">
+                            <i class="fas fa-key"></i>
+                            <span>BYO API key</span>
+                        </div>
+                        <div class="highlight">
+                            <i class="fas fa-lock"></i>
+                            <span>本地优先</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number">7</span>
+                            <span class="stat-label">Rust crates</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number">100+</span>
+                            <span class="stat-label">文档页（中英）</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number">6</span>
+                            <span class="stat-label">平台 binary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>∞ mimo-tui</h3>
+                    <p>原生 MiMo 终端 agent，开源 MIT，永久免费。</p>
+                    <div class="social-links">
+                        <a href="https://github.com/duolaAmengweb3/mimo-tui" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="https://x.com/hunterweb303" target="_blank" rel="noopener" aria-label="X"><i class="fab fa-x-twitter"></i></a>
+                        <a href="https://t.me/dsa885" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="#features">能力</a></li>
+                        <li><a href="#workflow">怎么用</a></li>
+                        <li><a href="#installation">安装</a></li>
+                        <li><a href="#about">关于</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>资源</h4>
+                    <ul>
+                        <li><a href="https://github.com/duolaAmengweb3/mimo-tui" target="_blank" rel="noopener">源码 (GitHub)</a></li>
+                        <li><a href="https://github.com/duolaAmengweb3/mimo-tui/releases" target="_blank" rel="noopener">下载 Release</a></li>
+                        <li><a href="https://github.com/duolaAmengweb3/mimo-tui/issues" target="_blank" rel="noopener">提 Issue</a></li>
+                        <li><a href="https://www.npmjs.com/package/mimo-tui" target="_blank" rel="noopener">npm 包</a></li>
+                        <li><a href="/docs/">完整文档（中英）</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系</h4>
+                    <ul>
+                        <li><a href="https://x.com/hunterweb303" target="_blank" rel="noopener">X · @hunterweb303</a></li>
+                        <li><a href="https://t.me/dsa885" target="_blank" rel="noopener">Telegram · t.me/dsa885</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>built by <strong>duola</strong> · <a href="https://x.com/hunterweb303" target="_blank" rel="noopener">@hunterweb303</a> · © 2026 · MIT licensed</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

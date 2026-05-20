@@ -35,6 +35,13 @@ pub struct App {
     pub input: String,
     pub cursor: usize,
     pub scroll: u16,
+    /// When true, scroll position auto-follows the tail of the buffer (default).
+    /// Goes false the moment the user presses PageUp, returns to true on submit
+    /// or PageDown past the bottom.
+    pub follow_tail: bool,
+    /// Latest max_scroll value seen by the renderer — used so that PageUp from
+    /// the bottom can step *up* from the actual current view rather than from 0.
+    pub last_max_scroll: u16,
     pub should_quit: bool,
     pub is_running: bool,
     pub agent: Arc<tokio::sync::Mutex<Agent>>,
@@ -63,6 +70,8 @@ impl App {
             input: String::new(),
             cursor: 0,
             scroll: 0,
+            follow_tail: true,
+            last_max_scroll: 0,
             should_quit: false,
             is_running: false,
             agent: Arc::new(tokio::sync::Mutex::new(agent)),
@@ -72,7 +81,9 @@ impl App {
             last_cache_tokens: 0,
             agent_task: None,
             event_tx: None,
-            status_hint: "type a message and press Enter · Ctrl+D to exit · /help".to_string(),
+            status_hint:
+                "Enter to send · Alt+↑/↓ or Ctrl+U/Ctrl+E scroll · Ctrl+C exit · /help"
+                    .to_string(),
         }
     }
 
@@ -154,16 +165,46 @@ impl App {
         }
     }
 
+    /// Returns true when the key was consumed by a scroll binding.
+    /// Bindings:
+    /// - `PageUp` / `PageDown`           — standard (won't reach us if VS Code grabs them)
+    /// - `Alt+Up` / `Alt+Down`           — most portable in VS Code / iTerm / Terminal.app
+    /// - `Ctrl+U` / `Ctrl+E`             — Vim-ish; Ctrl+D is reserved for exit
+    fn try_scroll(&mut self, k: crossterm::event::KeyEvent) -> bool {
+        use crossterm::event::{KeyCode::*, KeyModifiers};
+        let big = self.last_max_scroll.max(20) / 2 + 5;
+        let small: u16 = 5;
+        let ctrl = k.modifiers.contains(KeyModifiers::CONTROL);
+        let alt = k.modifiers.contains(KeyModifiers::ALT);
+        let (delta, is_up) = match (ctrl, alt, k.code) {
+            (false, false, PageUp) => (small, true),
+            (false, false, PageDown) => (small, false),
+            (false, true, Up) => (small, true),
+            (false, true, Down) => (small, false),
+            (true, false, Char('u' | 'U')) => (big, true),
+            (true, false, Char('e' | 'E')) => (big, false),
+            _ => return false,
+        };
+        if is_up {
+            if self.follow_tail {
+                self.scroll = self.last_max_scroll;
+            }
+            self.follow_tail = false;
+            self.scroll = self.scroll.saturating_sub(delta);
+        } else {
+            self.scroll = self.scroll.saturating_add(delta);
+        }
+        true
+    }
+
     async fn handle_key(&mut self, k: crossterm::event::KeyEvent) {
         use crossterm::event::KeyCode::*;
+        if self.try_scroll(k) {
+            return;
+        }
         if self.is_running {
-            // While the agent is running, we only respond to Ctrl+C (handled above)
-            // and PageUp/Down for scrolling. Everything else is ignored.
-            match k.code {
-                PageUp => self.scroll = self.scroll.saturating_sub(5),
-                PageDown => self.scroll = self.scroll.saturating_add(5),
-                _ => {}
-            }
+            // While the agent is running we accept only scroll keys (above) and
+            // Ctrl+C (handled in the caller). Everything else is ignored.
             return;
         }
         match k.code {
@@ -206,8 +247,6 @@ impl App {
             }
             Home => self.cursor = 0,
             End => self.cursor = self.input.len(),
-            PageUp => self.scroll = self.scroll.saturating_sub(5),
-            PageDown => self.scroll = self.scroll.saturating_add(5),
             _ => {}
         }
     }
@@ -215,6 +254,7 @@ impl App {
     async fn submit(&mut self) {
         let text = std::mem::take(&mut self.input);
         self.cursor = 0;
+        self.follow_tail = true;
 
         if let Some(rest) = text.strip_prefix('/') {
             self.handle_slash(rest);

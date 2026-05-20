@@ -145,7 +145,7 @@ impl StdioServer {
             stdin.flush().await?;
         }
 
-        let resp = tokio::time::timeout(std::time::Duration::from_secs(60), rx)
+        let resp = tokio::time::timeout(std::time::Duration::from_secs(180), rx)
             .await
             .context("mcp request timed out")?
             .context("mcp pending dropped")?;

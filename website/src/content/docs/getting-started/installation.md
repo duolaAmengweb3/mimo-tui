@@ -5,8 +5,8 @@ description: "7 种方式装 mimo-tui · macOS / Linux / Windows 三平台全支
 
 import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="v1.0 准备中">
-当前 npm 上只有 v0.0.1 占位版本，跑起来只会显示提示信息。v1.0 完整版准备中，关注 [GitHub 仓库](https://github.com/duolaAmengweb3/mimo-tui) 获取进度。
+<Aside type="note" title="alpha 阶段">
+当前最新版本是 `v0.3.0-alpha.2`，已可在六大平台正常运行。alpha 阶段功能完整，但仍欢迎在 [GitHub Issues](https://github.com/duolaAmengweb3/mimo-tui/issues) 上反馈使用体验。
 </Aside>
 
 ## 推荐方式
@@ -41,7 +41,7 @@ curl -fsSL https://mimo-tui.pages.dev/install.sh | sh
 cargo install mimo-tui
 ```
 
-会从源码本地编译，需要 Rust 1.78+。
+会从源码本地编译，需要 Rust 1.82+。
 
 ### Scoop（Windows）
 

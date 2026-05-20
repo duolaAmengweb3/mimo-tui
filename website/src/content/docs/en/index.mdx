@@ -1,9 +1,9 @@
 ---
 title: mimo-tui
-description: Native open-source terminal AI coding agent for Xiaomi MiMo · Run MiMo in your terminal, like Claude Code / Codex
+description: An original open-source terminal AI coding agent for MiMo, designed as a native product instead of a Claude Code wrapper
 template: splash
 hero:
-  tagline: Run MiMo in your terminal, the same way you run Claude Code or Codex · MIT · Free forever
+  tagline: A native MiMo terminal agent with real tool use, MCP support, sessions, streaming, and no Claude-Code-style ToS gray area
   image:
     file: ../../../assets/logo-dark.svg
   actions:
@@ -17,23 +17,81 @@ hero:
       variant: secondary
 ---
 
-import { Card, CardGrid, Tabs, TabItem, LinkCard } from '@astrojs/starlight/components';
+import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components';
 
 <div class="status-badges">
   <span class="badge badge-version">v0.3.0-alpha.2</span>
-  <span class="badge badge-platforms">6 platforms</span>
-  <span class="badge badge-license">MIT</span>
-  <span class="badge badge-price">always free</span>
+  <span class="badge badge-platforms">Rust · 6 platforms</span>
+  <span class="badge badge-license">MIT Licensed</span>
+  <span class="badge badge-price">Free Forever</span>
 </div>
 
-## One-line install · Same UX as Claude Code
+<section class="hero-rail">
+  <div class="hero-note">
+    <span class="eyebrow">Terminal-native product</span>
+    <h2>Not a dressed-up docs page. A real product surface for MiMo.</h2>
+    <p>
+      mimo-tui is built around MiMo's actual model behavior: streaming, thinking, tool loops, session management,
+      cache visibility, and multi-region fallback. The goal is simple: make MiMo feel production-ready in the terminal.
+    </p>
+    <div class="proof-inline">
+      <span>Original architecture</span>
+      <span>Real-key verified</span>
+      <span>MCP dual protocol</span>
+      <span>Parallel sub-agents</span>
+    </div>
+  </div>
+
+  <div class="hero-panel">
+    <div class="panel-kicker">What shipping looks like</div>
+    <div class="panel-metrics">
+      <div>
+        <strong>102</strong>
+        <span>docs pages</span>
+      </div>
+      <div>
+        <strong>8</strong>
+        <span>built-in tools</span>
+      </div>
+      <div>
+        <strong>3</strong>
+        <span>built-in skills</span>
+      </div>
+      <div>
+        <strong>32</strong>
+        <span>max tool iterations</span>
+      </div>
+    </div>
+    <p class="panel-caption">From install flow to sandboxing, this is structured like a maintained CLI product, not a thin experiment.</p>
+  </div>
+</section>
+
+## Get working in three steps
+
+<div class="story-grid">
+  <div class="story-card">
+    <span class="story-index">01</span>
+    <h3>Install it</h3>
+    <p>npm, brew, cargo, docker, and curl are all supported. No repo archaeology required.</p>
+  </div>
+  <div class="story-card">
+    <span class="story-index">02</span>
+    <h3>Set up your key</h3>
+    <p>The wizard handles MiMo Token Plan keys, region selection, and fallback behavior cleanly.</p>
+  </div>
+  <div class="story-card">
+    <span class="story-index">03</span>
+    <h3>Start shipping</h3>
+    <p>Once inside the TUI, you can edit files, run shell commands, attach MCP servers, and split work across agents.</p>
+  </div>
+</div>
 
 <Tabs>
   <TabItem label="npm">
 ```bash
 npm install -g mimo-tui
-mimo init    # guided setup with your own API key
-mimo         # enter the full-screen TUI
+mimo init
+mimo
 ```
   </TabItem>
   <TabItem label="Homebrew">
@@ -66,18 +124,33 @@ docker run -it -v "$PWD":/workspace \
   </TabItem>
 </Tabs>
 
-## What mimo looks like
+## Terminal UX should feel like a product, not a log stream
 
+<div class="showcase-grid">
+  <div class="showcase-copy">
+    <span class="eyebrow">Interaction design</span>
+    <h3>Expose the work, not just the answer</h3>
+    <p>
+      thinking, tool calls, type checks, cache hits, and session state are all visible in real time.
+      That gives users observability into what the agent is actually doing instead of hiding everything behind one opaque reply.
+    </p>
+    <ul class="feature-list">
+      <li>Live streaming and thinking rendering</li>
+      <li>Tool execution and failure reasons stay visible</li>
+      <li>Prompt-cache savings are surfaced directly</li>
+      <li>Slash commands, sessions, and modes stay inside the terminal workflow</li>
+    </ul>
+  </div>
+
+  <div class="terminal-frame">
 ```text
 ∞ mimo-tui v0.3.0-alpha.2 · mimo-v2.5-pro · SGP · agent
 
-▎ user > Refactor Header.tsx to a function component, preserve all props
+▎ user > Refactor Header.tsx to a function component, preserve props, then run typecheck
 
-  thinking find file → read original → check props type → rewrite preserving signature
+  thinking find file → read original → inspect prop types → rewrite → verify
   ✓ read_file {"path":"src/components/Header.tsx"}
-  ✓ edit_file {"path":"src/components/Header.tsx",
-                "old_string":"class Header extends Component",...}
-    edited Header.tsx (1 replacement)
+  ✓ edit_file {"path":"src/components/Header.tsx", ...}
   ✓ shell {"command":"npm run typecheck"}
     no errors found
 
@@ -85,70 +158,56 @@ Header.tsx is now a function component. Type-check passed.
 
   usage in:1842 out:312 · cached 1568
 ```
+  </div>
+</div>
 
-## How it compares to alternatives
-
-| | Claude Code env-hack | XIAOMI-MiMo-code | **mimo-tui** |
-|---|---|---|---|
-| Original architecture | ❌ Anthropic shell | ❌ Reverse-engineered | ✅ From scratch |
-| Model identity | ❌ "I'm Claude" | Patched prompt | ✅ "I'm MiMo" |
-| Config directory | ⚠️ Conflicts with Claude Code | Isolated | ✅ `~/.mimo/` fully isolated |
-| Legal risk | Medium (Claude Code ToS) | High (reverse) | ✅ Zero (original + MIT) |
-| Cache hit visualization | ❌ | ❌ | ✅ Real-time token savings |
-| Smart 3-region routing | ❌ | ❌ | ✅ Auto-pick by latency + key fallback |
-| Built-in skills | 0 | 0 | ✅ 3 out of the box |
-| Streaming + thinking | ✅ | Partial | ✅ Live per-token |
-| MCP client | ✅ | Partial | ✅ stdio + HTTP |
-| Cross-platform binary | ✅ | TS package | ✅ 6-platform Rust binary |
-| Price | Claude plan | Free | ✅ Free forever |
-
-## What v0.3 actually ships
+## Core capabilities beyond “it can call an API”
 
 <CardGrid>
   <Card title="Complete agent loop" icon="rocket">
-    Anthropic Messages API + streaming SSE + tool loop + up to 32 iterations
+    Streaming SSE, tool execution, and up to 32 iterations, enough for non-trivial coding tasks.
   </Card>
   <Card title="8 built-in tools" icon="seti:powershell">
-    read / write / edit / shell / glob / grep / web_fetch / todo · on par with Claude Code
+    read / write / edit / shell / glob / grep / web_fetch / todo out of the box.
   </Card>
   <Card title="Parallel sub-agents" icon="random">
-    `task` tool dispatches up to 10 concurrent sub-agents
+    The `task` tool can dispatch up to 10 concurrent sub-agents for decomposition-heavy work.
   </Card>
   <Card title="MCP dual-protocol" icon="puzzle">
-    Both stdio and HTTP · drop in any official MCP server and it works
+    Both stdio and HTTP are supported, so existing MCP servers plug in with minimal friction.
   </Card>
   <Card title="Skills-compatible" icon="open-book">
-    Drop your existing `.claude/skills/*.md` in unchanged
-  </Card>
-  <Card title="3 built-in skills" icon="approve-check">
-    python-style / rust-style / git-commits · zero-config
+    Existing `.claude/skills/` content can be migrated directly with very little ceremony.
   </Card>
   <Card title="Three-platform sandbox" icon="setting">
-    macOS Seatbelt / Linux Landlock / Windows Job Objects · default on
+    macOS Seatbelt, Linux Landlock, and Windows Job Objects are built in from the start.
   </Card>
   <Card title="Plan / Agent / Auto modes" icon="bars">
-    Read-only · with approval · YOLO · switch at any time
+    Switch between read-only, approval-based, and YOLO execution depending on risk tolerance.
   </Card>
-  <Card title="Smart 3-region routing" icon="rocket">
-    CN / SGP / AMS · auto-pick by latency · auto-fallback if key isn't valid in chosen region
-  </Card>
-  <Card title="Auto context-compaction" icon="document">
-    Past threshold? Summarise old turns via the flash model, keep the last 4 verbatim
-  </Card>
-  <Card title="Full ratatui TUI" icon="laptop">
-    4-region layout · live streaming · cache-hit indicator · 7 slash commands
-  </Card>
-  <Card title="Session management" icon="list-format">
-    `/sessions list / resume / fork` · auto-saved to `~/.mimo/sessions/`
+  <Card title="Smart regional routing" icon="document">
+    CN / SGP / AMS latency checks plus automatic fallback when a key does not work in the chosen region.
   </Card>
 </CardGrid>
 
-## End-to-end verified
+## The important difference is product judgment, not just visuals
+
+| | Claude Code wrapper | XIAOMI-MiMo-code | **mimo-tui** |
+|---|---|---|---|
+| Architecture | Anthropic shell | Reverse-engineered | **Original implementation** |
+| Model identity | “I'm Claude” | Prompt patching | **Native MiMo identity** |
+| Config directory | Collision-prone | Isolated | **Dedicated `~/.mimo/`** |
+| Thinking / cache visibility | Partial | Incomplete | **Fully exposed** |
+| MCP support | Yes | Partial | **stdio + HTTP** |
+| Compliance | ToS gray area | High risk | **Original + MIT** |
+| Maintainability | Upstream constrained | Fragile | **Can evolve independently** |
+
+## Proven, not hypothetical
 
 <div class="metric-grid">
   <div class="metric">
     <div class="metric-number">6</div>
-    <div class="metric-label">platforms</div>
+    <div class="metric-label">supported platforms</div>
     <div class="metric-detail">macOS arm/x64 · Linux x64/arm64 gnu+musl · Windows x64</div>
   </div>
   <div class="metric">
@@ -157,83 +216,89 @@ Header.tsx is now a function component. Type-check passed.
     <div class="metric-detail">npm · brew · cargo · docker · curl</div>
   </div>
   <div class="metric">
-    <div class="metric-number">102</div>
-    <div class="metric-label">doc pages (bilingual)</div>
-    <div class="metric-detail">getting-started / concepts / tools / mcp / skills / ...</div>
+    <div class="metric-number">354K+</div>
+    <div class="metric-label">cached tokens observed</div>
+    <div class="metric-detail">Measured across 75 real API calls, not estimated marketing math</div>
   </div>
   <div class="metric">
-    <div class="metric-number">~3500</div>
-    <div class="metric-label">lines Rust across 7 crates</div>
-    <div class="metric-detail">anthropic-client / tools / core / tui / mcp / skills / sandbox</div>
+    <div class="metric-number">102</div>
+    <div class="metric-label">bilingual docs pages</div>
+    <div class="metric-detail">Install, MCP, skills, sandbox, usage, troubleshooting, and more</div>
   </div>
 </div>
 
-**Verified with a real MiMo Token Plan key**:
+<div class="proof-grid">
+  <div class="proof-card">
+    <h3>Real coding flow verified</h3>
+    <p>`mimo -p "write greet.py and run it"` exercises file writing, shell execution, and Python-style skill behavior.</p>
+  </div>
+  <div class="proof-card">
+    <h3>MCP is live</h3>
+    <p>The filesystem server's 13 tools were auto-registered and called successfully.</p>
+  </div>
+  <div class="proof-card">
+    <h3>Fallback actually works</h3>
+    <p>The wizard has already validated CN 401 failure followed by a successful switch to SGP.</p>
+  </div>
+  <div class="proof-card">
+    <h3>Sandboxing is enforced</h3>
+    <p>macOS Seatbelt blocked out-of-sandbox writes, proving the safety boundary is operational.</p>
+  </div>
+</div>
 
-- ✅ `mimo -p "write greet.py and run it"` → write_file + shell + auto-applied Python docstring (via skill)
-- ✅ MCP filesystem server's 13 tools auto-registered + invoked (`mcp__fs__read_text_file` etc.)
-- ✅ Wizard cross-region fallback (CN 401 → switched to SGP cleanly)
-- ✅ macOS Seatbelt blocked `echo > ~/sandbox-leak.txt`
-- ✅ Sub-agent dispatch (task tool)
-- ✅ 354K+ tokens of prompt cache hits across 75 API calls
+## Who this is for
 
-## Why not just hack Claude Code's env vars
+<div class="audience-grid">
+  <div class="audience-card">
+    <span class="eyebrow">For builders</span>
+    <h3>People who want MiMo inside their real dev workflow</h3>
+    <p>If you do not want to babysit prompts, wrappers, and environment-variable hacks, this is the sharper path.</p>
+  </div>
+  <div class="audience-card">
+    <span class="eyebrow">For teams</span>
+    <h3>People who care about maintainability and clean separation</h3>
+    <p>Independent config, original code, and explicit protocol support make future extension much less fragile.</p>
+  </div>
+</div>
 
-```diff
-- Model thinks it's Claude ("I am Claude" while talking to MiMo)
-- All error messages use Anthropic terminology
-- Config conflicts (Claude one moment, MiMo the next — opening both = chaos)
-- MiMo's thinking field isn't shown
-- Prompt cache stats aren't visible
-- Violates Claude Code's ToS (an Anthropic tool calling a non-Claude model)
-+ Native MiMo experience · model identifies itself correctly
-+ Every UI / command / log is MiMo-flavored
-+ Isolated `~/.mimo/` · coexists with Claude Code, never collides
-+ Live thinking + cache-hit rendering
-+ Fully compliant: original + uses MiMo's official public protocol
-```
-
-## Install → Run → Join the community
+## Entry points
 
 <div class="community-grid">
   <a class="community-card" href="https://github.com/duolaAmengweb3/mimo-tui" target="_blank">
-    <div class="community-icon">⭐</div>
-    <div class="community-name">GitHub</div>
+    <div class="community-icon">GitHub</div>
+    <div class="community-name">Source and issues</div>
     <div class="community-handle">duolaAmengweb3/mimo-tui</div>
-    <div class="community-cta">Star + issues</div>
+    <div class="community-cta">Open repository</div>
   </a>
 
   <a class="community-card" href="https://x.com/hunterweb303" target="_blank">
-    <div class="community-icon">𝕏</div>
-    <div class="community-name">X / Twitter</div>
+    <div class="community-icon">X</div>
+    <div class="community-name">Release updates</div>
     <div class="community-handle">@hunterweb303</div>
-    <div class="community-cta">Release news</div>
+    <div class="community-cta">Follow updates</div>
   </a>
 
   <a class="community-card" href="https://t.me/dsa885" target="_blank">
-    <div class="community-icon">✈</div>
-    <div class="community-name">Telegram</div>
+    <div class="community-icon">Telegram</div>
+    <div class="community-name">Live discussion</div>
     <div class="community-handle">t.me/dsa885</div>
-    <div class="community-cta">Live chat</div>
+    <div class="community-cta">Join chat</div>
   </a>
 
   <a class="community-card" href="/en/docs/" target="_blank">
-    <div class="community-icon">📖</div>
-    <div class="community-name">Full docs</div>
-    <div class="community-handle">102 pages · bilingual</div>
-    <div class="community-cta">User manual</div>
+    <div class="community-icon">Docs</div>
+    <div class="community-name">Full documentation</div>
+    <div class="community-handle">Bilingual · 102 pages</div>
+    <div class="community-cta">Read docs</div>
   </a>
 </div>
 
-## Free forever · No Pro / Enterprise tier
+## Free, and intended to stay that way
 
-mimo-tui is MIT licensed. **No paid tier, no data resale, no ads**.
+mimo-tui is MIT licensed. No Pro wall, no enterprise upsell layer, no ads, and no managed lock-in.
 
-Why?
-- The tool is for MiMo Token Plan users — they already paid Xiaomi
-- We want MiMo's ecosystem to have a Claude-Code-quality CLI
-- Charging MiMo users on top of that makes no sense
+- Users bring their own MiMo Token Plan API keys, so billing stays between the user and the model provider.
+- The tool layer stays light and original, with the focus on reliability, protocol compatibility, and workflow quality.
+- Future work should keep improving execution quality instead of adding ornamental pricing tiers.
 
-Every user uses their own MiMo Token Plan API key (just like Claude Code requires your `ANTHROPIC_API_KEY`).
-
-> "MiMo" is a registered trademark of Xiaomi · mimo-tui is an independent community project · no affiliation with Xiaomi
+> "MiMo" is a registered trademark of Xiaomi. mimo-tui is an independent community project and is not officially affiliated with Xiaomi.

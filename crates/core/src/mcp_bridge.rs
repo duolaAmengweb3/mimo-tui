@@ -50,9 +50,14 @@ impl McpHub {
         let mut servers: Vec<Arc<dyn McpClient>> = Vec::new();
         for (name, server_cfg) in cfg.servers {
             let spawn_result: Result<Arc<dyn McpClient>> = match server_cfg {
-                ServerEntry::Stdio(cfg) => StdioServer::spawn(name.clone(), cfg)
-                    .await
-                    .map(|s| Arc::new(s) as Arc<dyn McpClient>),
+                ServerEntry::Stdio(mut cfg) => {
+                    for arg in cfg.args.iter_mut() {
+                        *arg = expand_home(arg);
+                    }
+                    StdioServer::spawn(name.clone(), cfg)
+                        .await
+                        .map(|s| Arc::new(s) as Arc<dyn McpClient>)
+                }
                 ServerEntry::Http(cfg) => {
                     HttpServer::new(name.clone(), cfg).map(|s| Arc::new(s) as Arc<dyn McpClient>)
                 }
@@ -98,6 +103,25 @@ impl McpHub {
 /// Leak a string to get a `'static` reference — fine for boot-time tool names.
 fn leak(s: String) -> &'static str {
     Box::leak(s.into_boxed_str())
+}
+
+/// Expand leading `~` and `$HOME` in a path-like arg so users can write
+/// `"$HOME"` or `"~/projects"` in `mcp.json` without hardcoding their username.
+fn expand_home(arg: &str) -> String {
+    let Ok(home) = paths::home_dir() else {
+        return arg.to_string();
+    };
+    let home_str = home.to_string_lossy();
+    if arg == "~" || arg == "$HOME" {
+        return home_str.into_owned();
+    }
+    if let Some(rest) = arg.strip_prefix("~/") {
+        return format!("{}/{}", home_str, rest);
+    }
+    if let Some(rest) = arg.strip_prefix("$HOME/") {
+        return format!("{}/{}", home_str, rest);
+    }
+    arg.to_string()
 }
 
 struct McpToolAdapter {
