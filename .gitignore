@@ -52,13 +52,28 @@ tmp/
 temp/
 .tmp/
 
-# 品牌生成的 PNG（按需重生成，不入仓库）
+# 工程过程文档（不发布到公开仓库）
+PRD.md
+调研/
+上线清单/
+
+# 品牌：只保留 README 引用的 2 个 logo，其他设计稿不入仓库
+品牌/*
+!品牌/logo.svg
+!品牌/logo-dark.svg
 品牌/png/
 brand/png/
 
-# 内部开发笔记（不发布到公开仓库）
-# 调研/   ← 如果想保留在公开仓库就注释掉这两行
-# 上线清单/
+# 营销/演示素材（按需放到 cloudflare 或外部图床，不入仓库）
+banner.jpeg
+banner.png
+*.mp4
+*.mov
+*.gif
+demo-*
+
+# Landing 页源代码（已部署到 cloudflare pages，不入工程仓库）
+mimo-tui-website/
 
 # wrangler / cloudflare
 .wrangler/
